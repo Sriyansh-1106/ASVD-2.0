@@ -1,0 +1,1 @@
+"""ASVD Demo — Detection Module."""

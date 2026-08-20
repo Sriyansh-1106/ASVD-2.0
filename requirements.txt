@@ -1,0 +1,20 @@
+# ASVD Demo - AI Scam Voice Detection
+# Phase 1: Dataset & Testing
+
+# Data & ML
+pandas>=2.0
+numpy>=1.24
+scikit-learn>=1.3
+
+# NLP
+nltk>=3.8
+
+# Backend (installed now, used in Phase 5)
+fastapi>=0.100
+uvicorn[standard]>=0.23
+httpx>=0.24
+websockets>=11.0
+
+# Testing
+pytest>=7.4
+pytest-asyncio>=0.21
