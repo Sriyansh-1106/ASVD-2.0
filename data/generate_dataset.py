@@ -79,6 +79,28 @@ SCAM_DATA = {
         "action": "Verify the caller through an independent communication channel before transferring money.",
     },
 
+    "Kidnapping & Extortion Threat": {
+        "templates": [
+            "Maine tumhare {victim} ko kidnap kar liya hai. Mujhe Rs {amount} ki jarurat hai urgent chahiye warna bahut marunga. Police ko mat batana.",
+            "Bhai mujhe Rs {amount} ki jarurat hai argent chahiye warna bahut marunga. Maine tumhare {victim} ko kidnap kar liya hai.",
+            "Your {victim} is with us. Transfer Rs {amount} immediately to {phone} or we will kill him. Do not inform the police.",
+            "Tumhara {victim} mere kabze mein hai. Agar zinda dekhna chahte ho toh turant Rs {amount} bhej do. Koi chalaaki mat karna.",
+            "Maine tumhare {victim} ko uthwa liya hai. {amount} firauti chahiye aaj hi, warna jaan se maar dunga.",
+            "Listen carefully, we have kidnapped your {victim}. Send {amount} right now or face the consequences. Keep this secret.",
+            "Tumhare {victim} ki jaan khatre mein hai. {amount} transfer karo abhi ke abhi warna laash milegi. Kisi ko mat bolna.",
+            "Maine kidnap kar liya hai tumhare {victim} ko. Urgent Rs {amount} chahiye. Police ke paas gaye toh jaan se haath dho baithoge.",
+        ],
+        "vars": {
+            "victim": ["bete", "beti", "bacche", "bhai", "family member", "son", "daughter", "child"],
+            "amount": ["50,000", "1,00,000", "2,00,000", "5,00,000", "10,00,000", "500000", "200000"],
+            "phone": ["9876543210", "8765432109", "7654321098", "9988776655"],
+        },
+        "indicators": {"urgency": 1, "financial_request": 1, "emotional_manipulation": 1, "secrecy_request": 1,
+                       "authority_impersonation": 0, "otp_request": 0, "credential_request": 0, "threat_detected": 1},
+        "threat_level": "CRITICAL",
+        "action": "Do not transfer money. Immediately report the extortion/kidnapping threat to the local Police and Cyber Crime helpline 1930.",
+    },
+
     "Friend Impersonation": {
         "templates": [
             "Yaar, main {name} bol raha hoon. {problem}. Rs {amount} chahiye urgently. Baad mein lautaunga. Please group mein mat bolna.",

@@ -200,25 +200,44 @@ def assess_risk(text: str) -> dict:
     # 2. Calculate risk score (0-100)
     #
     # Formula:
-    #   - ML confidence contributes 50% (0-50 points)
-    #   - Indicator weights contribute 50% (0-50 points)
-    #   - SAFE label caps score at 20
+    #   - ML confidence contributes up to 50 points
+    #   - Indicator weights contribute up to 50 points
+    #   - Critical override: kidnapping, murder threats, OTP demands
+    #     force score to CRITICAL (85-100)
     # ------------------------------------------------------------------
-    if label == "SAFE":
+    has_critical_indicator = any(
+        ind in indicators
+        for ind in ["threat_detected", "otp_request", "credential_request"]
+    )
+
+    # Force label to SCAM if strong indicators or critical threat found
+    if has_critical_indicator or indicator_count >= 2:
+        label = "SCAM"
+        confidence = max(confidence, 0.92)
+
+    if label == "SAFE" and not indicators:
         risk_score = 0
     else:
         # ML component: confidence mapped to 0-50
         ml_score = confidence * 50
 
-        # Indicator component: weighted sum mapped to 0-50
+        # Indicator component: weighted sum
         indicator_score = 0
         for ind in indicators:
-            indicator_score += INDICATOR_WEIGHTS.get(ind, 5)
+            indicator_score += INDICATOR_WEIGHTS.get(ind, 8)
 
         # Normalize indicator score to 0-50 range
         indicator_normalized = min((indicator_score / MAX_INDICATOR_SCORE) * 50, 50)
-
         risk_score = int(round(ml_score + indicator_normalized))
+
+        # Critical Escalation Override
+        if has_critical_indicator:
+            # Kidnapping, physical threat, or OTP demands are always CRITICAL (85-100)
+            bonus = 15 if "threat_detected" in indicators else 10
+            risk_score = max(85, min(100, risk_score + bonus))
+        elif indicator_count >= 2:
+            risk_score = max(65, min(100, risk_score))
+
         risk_score = max(0, min(100, risk_score))  # clamp
 
     # ------------------------------------------------------------------

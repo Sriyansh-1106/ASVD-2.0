@@ -196,7 +196,8 @@ function renderHighlightedTranscript(text) {
   const threatKeywords = [
     "otp", "pin", "cvv", "password", "arrest", "jail", "fir", "police",
     "inspector", "cbi", "cyber crime", "transfer", "paisa", "rupees", "rs",
-    "urgent", "turant", "jaldi", "block", "freeze", "emergency", "accident"
+    "urgent", "argent", "turant", "jaldi", "block", "freeze", "emergency", "accident",
+    "kidnap", "kidnapping", "marunga", "maar", "kill", "firauti", "ransom", "500000", "lakh"
   ];
 
   let highlighted = text;

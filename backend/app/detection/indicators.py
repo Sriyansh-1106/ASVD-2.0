@@ -22,15 +22,51 @@ import re
 #   - "negative": context patterns that cancel out false positives
 # ====================================================================
 
+# ====================================================================
+# PHONETIC & ACCENT TEXT NORMALIZER
+# ====================================================================
+
+PHONETIC_REPLACEMENTS = [
+    (r"\bargent\b", "urgent"),
+    (r"\barjent\b", "urgent"),
+    (r"\burjent\b", "urgent"),
+    (r"\baarjent\b", "urgent"),
+    (r"\burjently\b", "urgently"),
+    (r"\bchahie\b", "chahiye"),
+    (r"\bjaroorat\b", "jarurat"),
+    (r"\bzaroorat\b", "jarurat"),
+    (r"\bpeisa\b", "paisa"),
+    (r"\botipi\b", "otp"),
+    (r"\bpassward\b", "password"),
+    (r"₹\s*", "rs "),
+]
+
+def normalize_speech_text(text: str) -> str:
+    """Normalize common Hinglish phonetic speech recognition variations."""
+    if not text:
+        return ""
+    t = text.lower()
+    for pattern, repl in PHONETIC_REPLACEMENTS:
+        t = re.sub(pattern, repl, t, flags=re.IGNORECASE)
+    return t
+
+
+# ====================================================================
+# INDICATOR PATTERNS
+# ====================================================================
+
 URGENCY_PATTERNS = {
     "positive": [
         r"\bturant\b", r"\bjaldi\b", r"\babhi\b", r"\bimmediately\b",
-        r"\burgent\b", r"\burgently\b", r"\bright now\b", r"\bdon'?t delay\b",
+        r"\burgent\b", r"\burgently\b", r"\bargent\b", r"\burjent\b", r"\barjent\b",
+        r"\bright now\b", r"\bdon'?t delay\b", r"\babhi ke abhi\b",
         r"\bwaqt nahi\b", r"\btime nahi\b", r"\bwithin \d+ (minute|hour|ghante)\b",
         r"\btoday only\b", r"\baaj hi\b", r"\baaj ke liye\b",
         r"\bjaldi karo\b", r"\bhurry\b", r"\bact now\b",
         r"\bexpire\b", r"\bdeadline\b", r"\btimer\b",
         r"\bek ghante mein\b", r"\b\d+ ghante\b", r"\b\d+ minute mein\b",
+        r"\bchahiye\b.*\b(turant|jaldi|urgent|abhi)\b",
+        r"\burgent\b.*\b(chahiye|chahie|hai)\b",
     ],
     "negative": [
         r"\bjaldi aa jaana\b", r"\bjaldi ghar\b", r"\bjaldi nikalenge\b",
@@ -40,13 +76,17 @@ URGENCY_PATTERNS = {
 FINANCIAL_PATTERNS = {
     "positive": [
         r"\bbhej do\b", r"\btransfer\b", r"\bsend money\b", r"\bsend the money\b",
-        r"\bpaisa\b.*\b(bhej|de|do|transfer)\b", r"\bamount\b.*\b(bhej|transfer|pay)\b",
-        r"\brs\s*[\d,]+\b", r"\brunpees?\b", r"\b(pay|payment)\s+(kar|karo|karein|karna)\b",
+        r"\bpaisa\b.*\b(bhej|de|do|transfer|chahiye|jarurat)\b",
+        r"\b(paise|rupaye|rupees|amount)\b.*\b(bhej|transfer|pay|do|chahiye|jarurat)\b",
+        r"₹\s*[\d,]+", r"\brs\.?\s*[\d,]+\b", r"\b[\d,]{4,}\s*(rupees|rs|paisa|chahiye|ki jarurat)\b",
+        r"\brunpees?\b", r"\b(pay|payment)\s+(kar|karo|karein|karna)\b",
         r"\bprocessing fee\b", r"\bregistration fee\b", r"\bsettlement\b",
         r"\bdeposit\b.*\b(bhej|karo|karein)\b", r"\bfine\b.*\b(bharo|do|pay)\b",
         r"\bverification (fee|charges)\b", r"\bclearance fee\b",
         r"\bupi\b.*\b(bhej|se|pe)\b.*\b(bhej|transfer|do)\b",
         r"\baccount (number|mein)\b.*\b(bhej|transfer|jama)\b",
+        r"\b(500000|100000|200000|50000|lakh|lakhs|crore|hazar)\b.*\b(chahiye|bhej|de|do|jarurat)\b",
+        r"\b(firauti|ransom|chanda|bhatta)\b",
     ],
     "negative": [
         r"\bsalary credit\b", r"\bsalary aa gayi\b", r"\bbill bhara\b",
@@ -104,12 +144,27 @@ AUTHORITY_PATTERNS = {
 
 THREAT_PATTERNS = {
     "positive": [
+        # Kidnapping & Hostage
+        r"\b(kidnap|kidnapping|agva|uthwa liya|uthwa lenge|kabze mein)\b",
+        r"\b(bete|beti|bacche|bache|family|gharwale|brother|sister)\b.*\b(kidnap|uthwa|kabze)\b",
+        r"\bkidnap\b.*\b(kar liya|kar lenge|hai)\b",
+
+        # Physical Violence & Murder Threats
+        r"\b(marunga|maar dunga|maar dalunga|mar dalenge|khatam kar dunga|goli mar dunga|jaan se|chhodunga nahi)\b",
+        r"\b(bahut marunga|jaan se mar|laash)\b",
+        r"\b(harm|kill|murder|dead|torture|shoot|beat)\b",
+
+        # Legal & Arrest Threats
         r"\barrest\b", r"\bjail\b", r"\bwarrant\b",
         r"\blegal action\b", r"\bcourt (mein|case|order)\b",
         r"\bcase file\b", r"\bfir\b", r"\bcriminal\b.*\b(case|charges)\b",
         r"\baccount\b.*\b(block|freeze|suspend|lock)\b.*\b(ho jayega|kar denge|permanently)\b",
         r"\bpassport\b.*\b(cancel|suspend)\b",
+
+        # Blackmail & Extortion
+        r"\b(blackmail|extortion|firauti|bhatta)\b",
         r"\bexpose\b", r"\bpublish\b", r"\brelease\b.*\b(publicly|online|social media)\b",
+        r"\b(video|photos?|pics?)\b.*\b(viral|leak|share|send)\b",
         r"\bcontacts ko bhej\b", r"\bsab ko bhej\b",
         r"\bconsequences\b", r"\bpolice aayegi\b", r"\bofficers will come\b",
         r"\basset seizure\b",
@@ -128,6 +183,7 @@ SECRECY_PATTERNS = {
         r"\bkeep this\b.*\b(private|confidential|secret)\b",
         r"\bfamily ko mat\b", r"\bpapa ko mat\b", r"\bmummy ko mat\b",
         r"\bgroup mein mat\b", r"\blawyer ko mat\b",
+        r"\bpolice ko mat\b", r"\bpolice ko bataya\b",
         r"\bhamare beech\b", r"\bbetween us\b",
         r"\bconfidential\b", r"\bclassified\b",
     ],
@@ -145,6 +201,7 @@ EMOTIONAL_PATTERNS = {
         r"\btrust me\b", r"\bplease trust\b", r"\bvishwas karo\b",
         r"\bbahut zaroorat\b", r"\bdesperate\b",
         r"\bI am in\b.*\b(trouble|danger)\b",
+        r"\b(bete|beti|baccha)\b.*\b(bachao|chhod do|khatre mein)\b",
         r"\bguaranteed\b.*\b(return|profit|income)\b",
         r"\bdouble\b.*\b(money|paise|paisa)\b",
         r"\b100%\s*(safe|legal|guaranteed)\b",
@@ -203,7 +260,8 @@ def detect_indicators(text: str) -> dict:
             "indicator_count": 0,
         }
 
-    text_lower = text.lower().strip()
+    text_norm = normalize_speech_text(text)
+    text_lower = text_norm.lower().strip()
 
     # Check each indicator
     indicators = {
