@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASVD 2.O — Receiver Threat Defense HUD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="hud-container">
+    <!-- Top Status Bar -->
+    <header class="hud-navbar">
+      <div class="brand-section">
+        <div class="shield-badge">🛡️</div>
+        <div>
+          <h1>ASVD 2.O Threat Defense HUD</h1>
+          <p>AI Scam Voice & Social Engineering Detection Engine</p>
+        </div>
+      </div>
+
+      <div class="system-status-group">
+        <div class="session-chip" id="sessionChip">
+          <span>ROOM:</span> <span id="currentSessionId">live-call-001</span>
+        </div>
+        <div class="status-indicator">
+          <span class="pulse-dot" id="systemPulse"></span>
+          <span id="systemStatusText">Monitoring Active</span>
+        </div>
+        <button class="btn-ghost" id="btnOpenHistory">
+          <span>📜</span> History
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Threat HUD Grid -->
+    <main class="hud-grid">
+      
+      <!-- Left Column: Circular Threat Gauge & Metadata -->
+      <aside class="threat-panel safe" id="threatPanel">
+        <div class="panel-title">Live Risk Assessment</div>
+
+        <!-- SVG Circular Dial (0 - 100) -->
+        <div class="gauge-wrapper">
+          <svg class="gauge-svg" viewBox="0 0 200 200">
+            <circle class="gauge-bg" cx="100" cy="100" r="90"></circle>
+            <circle class="gauge-progress" id="gaugeProgress" cx="100" cy="100" r="90"></circle>
+          </svg>
+          <div class="gauge-center-content">
+            <div class="score-number" id="riskScore">0</div>
+            <div class="score-label">RISK SCORE</div>
+          </div>
+        </div>
+
+        <div class="threat-level-badge" id="threatLevelBadge">LOW THREAT</div>
+
+        <div class="caller-meta">
+          <div class="meta-row">
+            <span class="meta-key">Incoming Caller:</span>
+            <span class="meta-val" id="callerIdentity">Unknown Caller</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-key">AI Confidence:</span>
+            <span class="meta-val" id="aiConfidence">100%</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-key">Threat Flags:</span>
+            <span class="meta-val" id="flagCount">0 Detected</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Right Column: Live Transcript, Indicators, Protective Actions -->
+      <section class="right-column">
+        
+        <!-- Live Call Transcript Card -->
+        <div class="transcript-card">
+          <div class="card-header">
+            <h2>Live Speech Transcript</h2>
+            <div class="live-indicator">
+              <span class="pulse-dot"></span>
+              <span>STREAMING</span>
+            </div>
+          </div>
+
+          <div class="transcript-feed" id="transcriptFeed">
+            <span class="transcript-placeholder">Waiting for incoming call audio or speech transcript from Device 1...</span>
+          </div>
+
+          <!-- Indicators Badge Grid -->
+          <div class="indicators-section">
+            <div class="panel-title" style="font-size: 11px;">Detected Threat Indicators</div>
+            <div class="indicators-grid" id="indicatorsGrid">
+              <div class="indicator-chip" id="ind-urgency">⏳ Urgency Pressure</div>
+              <div class="indicator-chip" id="ind-otp">🔑 OTP Request</div>
+              <div class="indicator-chip" id="ind-credential">💳 PIN / Password</div>
+              <div class="indicator-chip" id="ind-authority">👮 Authority Impersonation</div>
+              <div class="indicator-chip" id="ind-threat">⚠️ Threat / Extortion</div>
+              <div class="indicator-chip" id="ind-financial">💸 Money / UPI Transfer</div>
+              <div class="indicator-chip" id="ind-secrecy">🤫 Secrecy / Isolation</div>
+              <div class="indicator-chip" id="ind-emotional">🎭 Emotional Pressure</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Guidance & Emergency Actions -->
+        <div class="action-banner" id="actionBanner">
+          <div class="action-header">
+            <span>🛡️</span> <span id="actionTitle">AI Security Guidance</span>
+          </div>
+          <p class="action-text" id="actionAdvice">
+            No threat detected. This conversation appears safe.
+          </p>
+          <div class="emergency-actions-row">
+            <button class="btn-emergency" id="btnEndCall" onclick="alert('Call terminated safely.')">
+              <span>🛑</span> Hang Up Call
+            </button>
+            <button class="btn-helpline" onclick="window.open('tel:1930')">
+              <span>🚨</span> National Cyber Helpline 1930
+            </button>
+            <button class="btn-ghost" onclick="toggleAudioAlarm()">
+              <span>🔔</span> <span id="alarmBtnText">Toggle Warning Siren</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- History Modal -->
+  <div class="modal-backdrop" id="historyModal">
+    <div class="modal-card">
+      <div class="card-header">
+        <h2>Recent Threat Logs & Call History</h2>
+        <button class="btn-ghost" id="btnCloseHistory">✕ Close</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <p style="color: var(--text-dim);">Loading logs...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

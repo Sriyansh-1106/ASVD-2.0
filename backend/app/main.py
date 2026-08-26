@@ -48,28 +48,31 @@ app.include_router(api_router)
 app.include_router(ws_router)
 
 
+from fastapi.responses import FileResponse
+
 # Mount frontend directory if exists
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 FRONTEND_DIR = os.path.join(PROJECT_ROOT, "frontend")
+CALLER_DIR = os.path.join(FRONTEND_DIR, "caller")
+RECEIVER_DIR = os.path.join(FRONTEND_DIR, "receiver")
 
+# Mount each sub-folder so relative assets (style.css, app.js) resolve correctly
+if os.path.exists(CALLER_DIR):
+    app.mount("/caller", StaticFiles(directory=CALLER_DIR, html=True), name="caller-static")
+if os.path.exists(RECEIVER_DIR):
+    app.mount("/receiver", StaticFiles(directory=RECEIVER_DIR, html=True), name="receiver-static")
 if os.path.exists(FRONTEND_DIR):
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 
-@app.get("/")
-def root():
-    """Root landing endpoint."""
-    return {
-        "app": "ASVD 2.O — AI Scam Voice Detection System",
-        "status": "online",
-        "docs_url": "/docs",
-        "endpoints": {
-            "health": "/api/health",
-            "analyse": "/api/analyse",
-            "stats": "/api/stats",
-            "history": "/api/history",
-        }
-    }
+@app.get("/", response_class=FileResponse)
+def root_portal():
+    """Main portal landing page."""
+    portal_html = os.path.join(FRONTEND_DIR, "index.html")
+    if os.path.exists(portal_html):
+        return FileResponse(portal_html)
+    return FileResponse(os.path.join(FRONTEND_DIR, "receiver", "index.html"))
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,123 @@
+{
+  "test_samples": 602,
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "roc_auc": 1.0
+  },
+  "confusion_matrix": {
+    "labels": [
+      "SAFE",
+      "SCAM"
+    ],
+    "matrix": [
+      [
+        226,
+        0
+      ],
+      [
+        0,
+        376
+      ]
+    ],
+    "true_negative": 226,
+    "false_positive": 0,
+    "false_negative": 0,
+    "true_positive": 376
+  },
+  "category_breakdown": {
+    "Friend Impersonation": {
+      "total_samples": 24,
+      "accuracy": 1.0
+    },
+    "Blackmail": {
+      "total_samples": 28,
+      "accuracy": 1.0
+    },
+    "PIN/Credential Scam": {
+      "total_samples": 23,
+      "accuracy": 1.0
+    },
+    "Police Impersonation": {
+      "total_samples": 21,
+      "accuracy": 1.0
+    },
+    "Bank Fraud": {
+      "total_samples": 22,
+      "accuracy": 1.0
+    },
+    "Safe/None": {
+      "total_samples": 226,
+      "accuracy": 1.0
+    },
+    "Government Impersonation": {
+      "total_samples": 34,
+      "accuracy": 1.0
+    },
+    "Job Scam": {
+      "total_samples": 24,
+      "accuracy": 1.0
+    },
+    "Extortion": {
+      "total_samples": 29,
+      "accuracy": 1.0
+    },
+    "OTP Scam": {
+      "total_samples": 31,
+      "accuracy": 1.0
+    },
+    "Family Impersonation": {
+      "total_samples": 19,
+      "accuracy": 1.0
+    },
+    "Loan Scam": {
+      "total_samples": 31,
+      "accuracy": 1.0
+    },
+    "Emergency Money Scam": {
+      "total_samples": 23,
+      "accuracy": 1.0
+    },
+    "Financial Manipulation": {
+      "total_samples": 22,
+      "accuracy": 1.0
+    },
+    "Investment Scam": {
+      "total_samples": 23,
+      "accuracy": 1.0
+    },
+    "Fake Parcel/Customs Scam": {
+      "total_samples": 22,
+      "accuracy": 1.0
+    }
+  },
+  "classification_report": {
+    "SAFE": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 226.0
+    },
+    "SCAM": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 376.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 602.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 602.0
+    }
+  }
+}

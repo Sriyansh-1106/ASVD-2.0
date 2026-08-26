@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASVD 2.O — Caller Device Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">📞</div>
+        <div>
+          <h1>Caller Simulator</h1>
+          <p>ASVD 2.O — Device 1 (Live Voice & Attack Vector Transmitter)</p>
+        </div>
+      </div>
+      <div class="connection-badge">
+        <span class="status-dot" id="wsStatusDot"></span>
+        <span id="wsStatusText">Connecting...</span>
+      </div>
+    </header>
+
+    <!-- Call Session Config -->
+    <section class="session-info">
+      <div class="input-group">
+        <label for="sessionId">Session Room ID</label>
+        <input type="text" id="sessionId" value="live-call-001" placeholder="Enter session ID">
+      </div>
+      <div class="input-group">
+        <label for="callerName">Caller Identity / Label</label>
+        <input type="text" id="callerName" value="+91 98765 43210 (Unknown)" placeholder="Caller Number or Name">
+      </div>
+      <div class="input-group">
+        <label for="languageSelect">Speech Language</label>
+        <select id="languageSelect">
+          <option value="en-IN">English (India)</option>
+          <option value="hi-IN">Hindi (India)</option>
+          <option value="en-US">English (Global)</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Live Call Status & Controls -->
+    <section class="call-panel">
+      <div class="call-status-pill" id="callStatusPill">Standby — Ready to Connect</div>
+      
+      <div class="call-timer" id="callTimer">00:00</div>
+      
+      <!-- Live Audio Waveform & Voice Meter -->
+      <div class="visualizer-container">
+        <canvas id="waveform"></canvas>
+        <div class="voice-meter-bar" id="voiceMeterBar" style="width: 0%;"></div>
+      </div>
+
+      <!-- Live Spoken Speech Display Box -->
+      <div class="live-speech-box" id="liveSpeechBox">
+        <div class="speech-box-header">
+          <span class="speech-box-tag">🎙️ LIVE SPEECH STREAM:</span>
+          <span class="speech-box-status" id="speechBoxStatus">Standby (Click Mic to Speak)</span>
+        </div>
+        <div class="speech-live-text" id="speechLiveText">
+          <span class="placeholder-text">Your spoken words will appear here in real-time as you talk into the microphone...</span>
+        </div>
+      </div>
+
+      <!-- Live Threat Assessment Monitor inside Caller Device -->
+      <div class="threat-preview-card" id="threatPreviewCard">
+        <div class="threat-preview-header">
+          <span class="threat-preview-title">🛡️ REAL-TIME AI THREAT MONITOR</span>
+          <a href="/receiver" target="_blank" class="link-receiver">Open Receiver HUD ➔</a>
+        </div>
+        <div class="threat-preview-body">
+          <div class="threat-score-col">
+            <div class="preview-score-num" id="previewScore">0</div>
+            <div class="preview-score-lbl">RISK / 100</div>
+          </div>
+          <div class="threat-info-col">
+            <div class="preview-level-badge safe" id="previewLevelBadge">SAFE CALL</div>
+            <div class="preview-indicators-list" id="previewIndicatorsList">
+              <span class="no-indicator-tag">No threat markers detected yet.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Mic Status / Hint Banner -->
+      <div class="mic-status-banner" id="micStatusBanner">
+        🎙️ Microphone is ready. Click <b>"Start Speaking (Mic)"</b> to capture voice or click <b>"Auto Voice Stream"</b> below.
+      </div>
+
+      <!-- Main Action Buttons -->
+      <div class="controls-row">
+        <button class="btn-primary" id="btnStartCall">
+          <span>📲</span> Start Live Call
+        </button>
+        <button class="btn-mic" id="btnToggleMic">
+          <span>🎙️</span> <span id="micLabel">Start Speaking (Mic)</span>
+        </button>
+        <button class="btn-simulate" id="btnSimulateStream">
+          <span>⚡</span> Auto Voice Stream
+        </button>
+        <button class="btn-danger" id="btnEndCall" style="display: none;">
+          <span>🛑</span> End Call
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Scenario Presets -->
+    <section class="presets-section">
+      <label>⚡ Quick-Inject Cyber Scam Scenarios (1-Click Real-Time Stream)</label>
+      <div class="preset-grid">
+        <div class="preset-card" onclick="injectPreset('sbi_otp')">
+          <div class="preset-title">
+            <span>Bank Fraud / OTP Demand</span>
+            <span class="preset-type scam">CRITICAL</span>
+          </div>
+          <div class="preset-desc">SBI security demanding 6-digit OTP to prevent immediate account freeze.</div>
+        </div>
+
+        <div class="preset-card" onclick="injectPreset('police_arrest')">
+          <div class="preset-title">
+            <span>Police CBI Arrest Warrant</span>
+            <span class="preset-type scam">CRITICAL</span>
+          </div>
+          <div class="preset-desc">Fake Cyber Crime Inspector claiming FIR registered, demanding Rs 2 Lakh transfer.</div>
+        </div>
+
+        <div class="preset-card" onclick="injectPreset('accident_emergency')">
+          <div class="preset-title">
+            <span>Hospital Emergency</span>
+            <span class="preset-type scam">HIGH</span>
+          </div>
+          <div class="preset-desc">Relative met with road accident, urgently requesting Rs 50,000 for doctor fee.</div>
+        </div>
+
+        <div class="preset-card" onclick="injectPreset('safe_family')">
+          <div class="preset-title">
+            <span>Safe Family Conversation</span>
+            <span class="preset-type safe">SAFE</span>
+          </div>
+          <div class="preset-desc">Casual talk about dinner, office traffic, and grocery shopping.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Custom Speech / Text Box -->
+    <section class="input-section">
+      <label for="customSpeech">Live Transcript / Custom Speech Buffer</label>
+      <textarea id="customSpeech" placeholder="Speak into your microphone or type Hindi / English speech here..."></textarea>
+      
+      <div class="actions-bar">
+        <span class="hint-text">💡 Every spoken or typed sentence is streamed instantly to the Receiver HUD.</span>
+        <button class="btn-primary" id="btnSendText">
+          <span>🚀</span> Transmit Text Now
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

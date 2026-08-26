@@ -61,8 +61,10 @@ def health_check():
     }
 
 
+from backend.app.api.websocket import manager
+
 @router.post("/analyse", response_model=AnalyseResponse)
-def analyse_text(request: AnalyseRequest):
+async def analyse_text(request: AnalyseRequest):
     """Analyse conversation text for cyber scam indicators and risk score."""
     assessment = assess_risk(request.text)
     
@@ -73,6 +75,16 @@ def analyse_text(request: AnalyseRequest):
         session_id=request.session_id,
         caller_id=request.caller_id,
     )
+
+    # Broadcast to WebSocket room if session provided
+    if request.session_id:
+        await manager.broadcast_to_session(request.session_id, {
+            "type": "threat_alert",
+            "session_id": request.session_id,
+            "chunk": request.text,
+            "full_transcript": request.text,
+            "data": assessment,
+        })
     
     return {
         "id": record_id,
@@ -97,6 +109,47 @@ def get_system_stats():
         "model": model_metrics,
         "database": db_stats,
         "status": "operational",
+    }
+
+
+from fastapi import Request, UploadFile, File, Form
+from backend.app.speech.speech_to_text import transcribe_audio_chunk
+
+@router.post("/speech_to_text")
+async def speech_to_text_endpoint(
+    audio: Optional[UploadFile] = File(None),
+    language: str = Form("en-IN"),
+    session_id: Optional[str] = Form("live-call-001"),
+    caller_id: Optional[str] = Form("Live Caller")
+):
+    """Receive raw voice audio file from browser microphone, transcribe to text, and run threat assessment."""
+    if not audio:
+        return {"text": "", "threat": None}
+
+    audio_bytes = await audio.read()
+    transcribed_text = transcribe_audio_chunk(audio_bytes, language=language)
+
+    assessment = None
+    if transcribed_text:
+        assessment = assess_risk(transcribed_text)
+        save_analysis(
+            conversation_text=transcribed_text,
+            assessment=assessment,
+            session_id=session_id,
+            caller_id=caller_id,
+        )
+        if session_id:
+            await manager.broadcast_to_session(session_id, {
+                "type": "threat_alert",
+                "session_id": session_id,
+                "chunk": transcribed_text,
+                "full_transcript": transcribed_text,
+                "data": assessment,
+            })
+
+    return {
+        "text": transcribed_text,
+        "threat": assessment
     }
 
 

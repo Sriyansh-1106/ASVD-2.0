@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASVD 2.O — AI Cyber Scam Voice Detection System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-core: #040711;
+      --bg-card: rgba(11, 19, 38, 0.75);
+      --border-cyan: rgba(0, 242, 254, 0.35);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --cyan: #00f2fe;
+      --blue: #38bdf8;
+      --red: #ff1155;
+      --green: #00ff88;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+    }
+    * { margin:0; padding:0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+    
+    body {
+      background-color: var(--bg-core);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.14) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(255, 17, 85, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.09) 0%, transparent 45%);
+      animation: cyber-ambient 22s ease-in-out infinite alternate;
+      z-index: -2;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes cyber-ambient {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.08); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1060px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .badge {
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid var(--border-cyan);
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 18px;
+      border-radius: 30px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+    }
+
+    h1 {
+      font-size: 46px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 40%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 700px;
+      line-height: 1.6;
+    }
+
+    .devices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+    }
+
+    .device-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-cyan);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 12px 45px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .device-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0, 242, 254, 0.25);
+    }
+
+    .device-card.receiver-card {
+      border-color: rgba(255, 17, 85, 0.4);
+    }
+
+    .device-card.receiver-card:hover {
+      box-shadow: 0 20px 60px rgba(255, 17, 85, 0.25);
+    }
+
+    .card-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+    }
+
+    .caller-icon { 
+      background: linear-gradient(135deg, #00f2fe, #4facfe); 
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);
+    }
+    
+    .receiver-icon { 
+      background: linear-gradient(135deg, #ff1155, #ff5500); 
+      box-shadow: 0 0 25px rgba(255, 17, 85, 0.4);
+    }
+
+    .device-card h2 { font-size: 24px; font-weight: 800; }
+    .device-card p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    .feature-list li { display: flex; align-items: center; gap: 8px; }
+
+    .btn-launch {
+      margin-top: auto;
+      text-decoration: none;
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #04101e;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(0, 242, 254, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-launch.receiver {
+      background: linear-gradient(135deg, var(--red), #ff5500);
+      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(255, 17, 85, 0.4);
+    }
+
+    .btn-launch:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
+    }
+
+    .pipeline-bar {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .step-arrow { color: var(--cyan); font-weight: 800; }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <header>
+      <div class="badge">ASVD 2.O • REAL-TIME CYBER DEFENSE PLATFORM</div>
+      <h1>AI Scam Voice Detection Portal</h1>
+      <p class="subtitle">
+        Enterprise-grade real-time voice defense identifying cyber impersonation, OTP extortion, banking fraud, and social engineering in English, Hindi & Hinglish.
+      </p>
+    </header>
+
+    <!-- Pipeline Visualizer Bar -->
+    <div class="pipeline-bar">
+      <div class="step-item"><span>🎙️</span> Live Audio Stream</div>
+      <span class="step-arrow">➔</span>
+      <div class="step-item"><span>📝</span> Speech to Text</div>
+      <span class="step-arrow">➔</span>
+      <div class="step-item"><span>🧠</span> NLP Threat Markers</div>
+      <span class="step-arrow">➔</span>
+      <div class="step-item"><span>📊</span> ML Classification</div>
+      <span class="step-arrow">➔</span>
+      <div class="step-item"><span>🛡️</span> Threat HUD Alert</div>
+    </div>
+
+    <!-- 2 Device Selection Cards -->
+    <div class="devices-grid">
+      
+      <!-- Device 1: Caller Simulator -->
+      <div class="device-card">
+        <div class="card-icon caller-icon">📞</div>
+        <div>
+          <h2>Device 1: Caller Simulator</h2>
+          <p>Simulates the incoming phone caller with live microphone capture, real-time audio waveform visualizer, and 1-click cyber scam attack vectors.</p>
+        </div>
+        <ul class="feature-list">
+          <li>✅ Live Microphone Speech-to-Text (Hindi / English / Hinglish)</li>
+          <li>✅ 1-Click Bank, CBI Police & Emergency Scam Presets</li>
+          <li>✅ Real-Time Voice Waveform Visualizer & Call Timer</li>
+          <li>✅ Live Chunk-by-Chunk Simulated Voice Streaming</li>
+        </ul>
+        <a href="/caller" class="btn-launch">
+          <span>📲</span> Launch Caller Device
+        </a>
+      </div>
+
+      <!-- Device 2: Receiver Threat HUD -->
+      <div class="device-card receiver-card">
+        <div class="card-icon receiver-icon">🛡️</div>
+        <div>
+          <h2>Device 2: Receiver HUD</h2>
+          <p>The victim's real-time AI security shield displaying 0–100 threat risk gauge, audio warning siren, flagged behavioral chips, and 1930 emergency advice.</p>
+        </div>
+        <ul class="feature-list">
+          <li>✅ 0–100 Circular Threat Risk Gauge</li>
+          <li>✅ Live Transcript with Real-Time Scam Keyword Tagging</li>
+          <li>✅ 8 Psychological Coercion Indicator Badges</li>
+          <li>✅ Synthesized Audio Warning Siren & Helpline Actions</li>
+        </ul>
+        <a href="/receiver" class="btn-launch receiver">
+          <span>🚨</span> Launch Receiver HUD
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
