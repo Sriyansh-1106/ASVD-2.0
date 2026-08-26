@@ -11,6 +11,11 @@ __pycache__/
 # Databases
 *.db
 
+# Documentation files kept local only
+*.docx
+generate_doc.py
+test_live_system.py
+
 # OS files
 .DS_Store
 Thumbs.db
