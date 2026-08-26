@@ -23,29 +23,66 @@ import re
 # ====================================================================
 
 # ====================================================================
-# PHONETIC & ACCENT TEXT NORMALIZER
+# COMPREHENSIVE INDIAN ACCENT & HINGLISH PHONETIC NORMALIZER
 # ====================================================================
 
 PHONETIC_REPLACEMENTS = [
-    (r"\bargent\b", "urgent"),
-    (r"\barjent\b", "urgent"),
-    (r"\burjent\b", "urgent"),
-    (r"\baarjent\b", "urgent"),
-    (r"\burjently\b", "urgently"),
-    (r"\bchahie\b", "chahiye"),
-    (r"\bjaroorat\b", "jarurat"),
-    (r"\bzaroorat\b", "jarurat"),
-    (r"\bpeisa\b", "paisa"),
-    (r"\botipi\b", "otp"),
-    (r"\bpassward\b", "password"),
+    # --- Urgency & Accent variations ---
+    (r"\b(argent|arjent|urjent|aarjent|ergent|arjant)\b", "urgent"),
+    (r"\b(argently|urjently|arjtly)\b", "urgently"),
+    (r"\b(jldi|jalde|jaldee)\b", "jaldi"),
+    (r"\b(trunt|turnt)\b", "turant"),
+    (r"\b(chahie|chaheye|chahye|chaahiye)\b", "chahiye"),
+    (r"\b(jaroorat|zaroorat|jarurt|zrurat)\b", "jarurat"),
+    
+    # --- Threats, Kidnapping & Violence ---
+    (r"\b(kidnaap|kidnapig|kidnaaping|kidnp|kidnaped)\b", "kidnap"),
+    (r"\b(uthva|utha|uthwa)\s*(liya|lia|lenge|luga)\b", "kidnap kar liya"),
+    (r"\b(mar duga|maar duga|maar dunga|mar dalunga|maruga|marenge)\b", "marunga"),
+    (r"\b(jan se|jaan se)\b", "jaan se"),
+    (r"\b(chodunga nahi|chhoduga nahi|choduga nhi)\b", "chhodunga nahi"),
+    (r"\b(firouti|firawti|ransom|ransem)\b", "firauti"),
+    
+    # --- Authority & Police Accent variations ---
+    (r"\b(pulis|pulees|polees|polic)\b", "police"),
+    (r"\b(insepctor|inspektar|ispector|insepector)\b", "inspector"),
+    (r"\b(sayber|syber|seiber)\s*(crime|kraym|kraim)?\b", "cyber crime"),
+    (r"\b(si\s*bi\s*ai|c\s*bi\s*i|c\.b\.i|cbi)\b", "cbi"),
+    (r"\b(ar\s*bi\s*ai|r\s*b\s*i|rbi)\b", "rbi"),
+    (r"\b(kourt|kot|kort)\b", "court"),
+    (r"\b(varent|varrant|warent|warrant)\b", "warrant"),
+    (r"\b(arest|errest|arst)\b", "arrest"),
+    (r"\b(jel|jale)\b", "jail"),
+    (r"\b(f\s*i\s*r|eff\s*aye\s*aar)\b", "fir"),
+
+    # --- Financial & Money Accents ---
     (r"₹\s*", "rs "),
+    (r"\b(peisa|paise|pesa|rupiya|rupee|rupia|rupye)\b", "paisa"),
+    (r"\b(ekaunt|akount|acount|acc)\b", "account"),
+    (r"\b(kard|kardh)\b", "card"),
+    (r"\b(tranfar|trasfer|tranzfer|bhej|bej|bhejo|bejo)\b", "transfer"),
+    (r"\b(gugle\s*pe|g\s*pay|gpay)\b", "google pay"),
+    (r"\b(fon\s*pe|phone\s*pe|fonpe|phonepe)\b", "phonepe"),
+    (r"\b(petiem|paytam|paytm)\b", "paytm"),
+    (r"\b(lakh|lakhs|lakh rupees|lac|lacs)\b", "lakh"),
+    (r"\b(krore|crore|crores)\b", "crore"),
+    (r"\b(hazar|hazaar|thousand)\b", "hazar"),
+    
+    # --- Credentials, Passwords & OTP Accents ---
+    (r"\b(otipi|o\s*t\s*p|odipi|ooteepee)\b", "otp"),
+    (r"\b(passward|pasward|pasword|passwrd)\b", "password"),
+    (r"\b(si\s*vi\s*vi|c\s*v\s*v|cv)\b", "cvv"),
+    (r"\b(masseg|mesage|massej|massege|msg)\b", "message"),
+    (r"\b(varification|varify|verifay)\b", "verification"),
+    (r"\b(bta|btao|btayein|batna)\b", "batao"),
+    (r"\b(ksiko|kisko|kisi\s*ko)\s*(mat|nhi|nahi)\b", "kisi ko mat"),
 ]
 
 def normalize_speech_text(text: str) -> str:
-    """Normalize common Hinglish phonetic speech recognition variations."""
+    """Normalize common Indian accent, Hinglish, and Speech-to-Text variations."""
     if not text:
         return ""
-    t = text.lower()
+    t = text.lower().strip()
     for pattern, repl in PHONETIC_REPLACEMENTS:
         t = re.sub(pattern, repl, t, flags=re.IGNORECASE)
     return t

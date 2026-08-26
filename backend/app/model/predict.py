@@ -13,7 +13,7 @@ import numpy as np
 from scipy.sparse import hstack
 import joblib
 
-from backend.app.detection.indicators import detect_indicators
+from backend.app.detection.indicators import detect_indicators, normalize_speech_text
 
 # ====================================================================
 # PATHS
@@ -89,11 +89,14 @@ def predict_conversation(text: str) -> dict:
     """
     _load_model()
 
+    # Normalize accent & phonetic speech variations
+    clean_text = normalize_speech_text(text or "")
+
     # 1. Run NLP indicator detection
-    indicator_result = detect_indicators(text or "")
+    indicator_result = detect_indicators(clean_text)
 
     # 2. Build feature vector (TF-IDF + binary indicators)
-    text_tfidf = _vectorizer.transform([text or ""])
+    text_tfidf = _vectorizer.transform([clean_text])
 
     indicator_values = np.array([[
         1.0 if indicator_result.get(col, False) else 0.0
