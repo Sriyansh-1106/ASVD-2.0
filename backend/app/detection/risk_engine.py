@@ -12,6 +12,7 @@ Returns:
     indicator_count, summary, and recommended_action.
 """
 
+from typing import Any, Dict, List, Optional
 from backend.app.model.predict import predict_conversation
 
 
@@ -151,7 +152,7 @@ def _generate_action(label: str, indicators: list) -> str:
 # MAIN ASSESSMENT FUNCTION
 # ====================================================================
 
-def assess_risk(text: str) -> dict:
+def assess_risk(text: Optional[str] = None) -> dict:
     """Assess the risk level of a conversation.
 
     Combines ML classification with NLP indicator detection to produce
@@ -172,7 +173,7 @@ def assess_risk(text: str) -> dict:
             - recommended_action: what the user should do
     """
     # Handle empty/None input
-    if not text or not str(text).strip():
+    if not text or not text.strip():
         return {
             "risk_score": 0,
             "risk_level": "LOW",
@@ -184,7 +185,7 @@ def assess_risk(text: str) -> dict:
             "recommended_action": "No action required. This appears to be a normal conversation.",
         }
 
-    text = str(text).strip()
+    text = text.strip()
 
     # ------------------------------------------------------------------
     # 1. Run ML prediction (includes indicator detection internally)

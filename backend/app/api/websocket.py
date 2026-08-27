@@ -10,7 +10,7 @@ Voice/Speech -> NLP Indicators -> ML Classification -> Risk Assessment -> WebSoc
 """
 
 import json
-from typing import Dict, List
+from typing import Any, Dict, List
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from backend.app.detection.risk_engine import assess_risk
@@ -25,18 +25,18 @@ class ConnectionManager:
 
     def __init__(self):
         # session_id -> list of active websockets
-        self.active_rooms: Dict[str, List[WebSocket]] = {}
+        self.active_rooms: Dict[str, List[Any]] = {}
         # session_id -> SpeechPipeline
         self.session_pipelines: Dict[str, SpeechPipeline] = {}
 
-    async def connect(self, websocket: WebSocket, session_id: str):
+    async def connect(self, websocket: Any, session_id: str):
         await websocket.accept()
         if session_id not in self.active_rooms:
             self.active_rooms[session_id] = []
             self.session_pipelines[session_id] = SpeechPipeline(session_id)
         self.active_rooms[session_id].append(websocket)
 
-    def disconnect(self, websocket: WebSocket, session_id: str):
+    def disconnect(self, websocket: Any, session_id: str):
         if session_id in self.active_rooms:
             if websocket in self.active_rooms[session_id]:
                 self.active_rooms[session_id].remove(websocket)
@@ -95,8 +95,11 @@ async def websocket_call_endpoint(websocket: WebSocket, session_id: str, role: s
             if msg_type == "audio_transcript":
                 chunk_text = msg.get("text", "").strip()
                 if chunk_text:
-                    # Accumulate ongoing conversation transcript
-                    cumulative_transcript = pipeline.add_transcript_chunk(chunk_text)
+                    # The REST /api/analyse endpoint accumulates via SpeechPipeline.
+                    # WebSocket receives the same already-accumulated transcript from
+                    # the frontend (accumulatedTranscript), so we overwrite rather than
+                    # append to avoid double-counting the same chunk.
+                    cumulative_transcript = pipeline.set_transcript(chunk_text)
 
                     # Run Real-Time Scam Assessment Pipeline
                     assessment = assess_risk(cumulative_transcript)

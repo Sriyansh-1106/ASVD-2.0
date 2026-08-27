@@ -77,7 +77,7 @@ def save_analysis(
             assessment.get("recommended_action", ""),
         ))
         conn.commit()
-        return cursor.lastrowid
+        return cursor.lastrowid if cursor.lastrowid is not None else 0
 
 
 def get_recent_history(limit: int = 50) -> List[Dict[str, Any]]:

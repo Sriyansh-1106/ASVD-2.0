@@ -68,7 +68,7 @@ async def test_live_system():
                     break
 
             assert alert is not None
-            print(f"\n[5] Receiver HUD Alert Verified:")
+            print("\n[5] Receiver HUD Alert Verified:")
             print(f"    - Type: {alert.get('type')}")
             print(f"    - Risk Score: {alert.get('data', {}).get('risk_score')}/100")
             print(f"    - Threat Level: {alert.get('data', {}).get('risk_level')}")

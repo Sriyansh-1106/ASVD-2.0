@@ -1,6 +1,5 @@
 """Unit tests for ASVD Risk Scoring Engine."""
 
-import pytest
 from backend.app.detection.risk_engine import assess_risk
 
 

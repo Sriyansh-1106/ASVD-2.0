@@ -3,6 +3,6 @@
   "precision": 1.0,
   "recall": 1.0,
   "f1": 1.0,
-  "samples_train": 2923,
-  "samples_val": 627
+  "samples_train": 4631,
+  "samples_val": 993
 }

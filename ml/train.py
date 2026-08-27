@@ -20,13 +20,15 @@ if hasattr(sys.stdout, "reconfigure"):
 if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
+from typing import List, Optional
+
 import joblib
 import numpy as np
 import pandas as pd
 from scipy.sparse import hstack
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, classification_report
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -43,7 +45,7 @@ INDICATOR_COLS = [
 
 def train_model(
     data_dir: str = DEFAULT_DATA_DIR,
-    output_dirs: list = None,
+    output_dirs: Optional[List[str]] = None,
     max_features: int = 5000,
     c_param: float = 1.0,
     random_state: int = 42,
@@ -147,7 +149,7 @@ def main():
     )
 
     print()
-    print(f"Validation Metrics:")
+    print("Validation Metrics:")
     print(f"  Accuracy:  {metrics['accuracy']:.4f}")
     print(f"  Precision: {metrics['precision']:.4f}")
     print(f"  Recall:    {metrics['recall']:.4f}")

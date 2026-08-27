@@ -30,12 +30,14 @@ INDICATOR_COLS = [
     "emotional_manipulation", "secrecy_request",
 ]
 
+from typing import Any
+
 # ====================================================================
 # LAZY-LOADED GLOBALS (loaded once on first call)
 # ====================================================================
 
-_model = None
-_vectorizer = None
+_model: Any = None
+_vectorizer: Any = None
 
 
 def _load_model():
@@ -88,6 +90,7 @@ def predict_conversation(text: str) -> dict:
             - indicator_count: number of indicators detected
     """
     _load_model()
+    assert _vectorizer is not None and _model is not None
 
     # Normalize accent & phonetic speech variations
     clean_text = normalize_speech_text(text or "")

@@ -4,7 +4,7 @@ Provides a unified classification interface for cyber-scam detection
 leveraging TF-IDF n-grams + binary indicator features with Logistic Regression.
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from backend.app.model.predict import predict_conversation, _load_model
 
 

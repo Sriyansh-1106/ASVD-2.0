@@ -378,73 +378,177 @@ function escapeHtml(text) {
 }
 
 // ====================================================================
-// LIVE MICROPHONE & SPEECH RECOGNITION (WEB SPEECH + AUDIO API)
+// LIVE MICROPHONE & SPEECH RECOGNITION (SMART VOICE SEGMENTATION + WHISPER)
 // ====================================================================
 
-// MediaRecorder for Dual-Engine Server-Side Speech Capture
 let mediaRecorder = null;
 let audioChunks = [];
-let mediaRecorderInterval = null;
+let isRecognitionRunning = false;
+let webSpeechCloudFailed = false;
+let lastWebSpeechTime = 0;
+let scriptProcessorNode = null;
+
+// Smart Speech Accumulator State
+let speechBuffer = [];
+let silenceFrames = 0;
+let speechDetectedInUtterance = false;
+let pcmProcessorInterval = null;
+
+// 16kHz 16-bit Mono PCM WAV Encoder
+function encodePcmWav(samples, inputSampleRate = 44100, targetSampleRate = 16000) {
+  let downsampled;
+  if (inputSampleRate === targetSampleRate) {
+    downsampled = samples;
+  } else {
+    const ratio = inputSampleRate / targetSampleRate;
+    const newLength = Math.round(samples.length / ratio);
+    downsampled = new Float32Array(newLength);
+    for (let i = 0; i < newLength; i++) {
+      const srcIdx = Math.floor(i * ratio);
+      downsampled[i] = srcIdx < samples.length ? samples[srcIdx] : 0;
+    }
+  }
+
+  const buffer = new ArrayBuffer(44 + downsampled.length * 2);
+  const view = new DataView(buffer);
+
+  function writeString(offset, str) {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(offset + i, str.charCodeAt(i));
+    }
+  }
+
+  // RIFF header
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + downsampled.length * 2, true);
+  writeString(8, 'WAVE');
+
+  // fmt chunk (16-bit PCM mono 16kHz)
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, targetSampleRate, true);
+  view.setUint32(28, targetSampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+
+  // data chunk
+  writeString(36, 'data');
+  view.setUint32(40, downsampled.length * 2, true);
+
+  let offset = 44;
+  for (let i = 0; i < downsampled.length; i++, offset += 2) {
+    const s = Math.max(-1, Math.min(1, downsampled[i]));
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+
+  return new Blob([view], { type: 'audio/wav' });
+}
 
 async function requestMicPermissionAndAudio() {
   try {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      micStream = stream;
-      setupAudioVisualizer(stream);
-      startMediaRecorderAudioSlices(stream);
-      return true;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      micStatusBanner.innerHTML = "❌ <b>Microphone API is not supported in this browser.</b> Please use Google Chrome or Microsoft Edge.";
+      micStatusBanner.className = "mic-status-banner error";
+      return false;
     }
+
+    const audioConstraints = {
+      echoCancellation: true,
+      noiseSuppression: false, // Don't let browser over-suppress vocal frequencies
+      autoGainControl: true,
+      channelCount: 1
+    };
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+    } catch (errConstraint) {
+      console.warn("Advanced constraints fallback to standard audio:", errConstraint);
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    }
+
+    micStream = stream;
+    setupAudioVisualizer(stream);
+    startSmartAudioEngine(stream);
+    return true;
   } catch (err) {
-    console.warn("Microphone access request rejected or not available:", err);
-    micStatusBanner.innerHTML = "❌ <b>Microphone Access Denied!</b> Click the lock / camera icon in the URL bar to allow microphone access.";
+    console.warn("Microphone access request rejected:", err);
+    micStatusBanner.innerHTML = "❌ <b>Microphone Access Denied!</b> Click the lock icon in the URL address bar to allow microphone permissions.";
     micStatusBanner.className = "mic-status-banner error";
     return false;
   }
-  return true;
 }
 
-function startMediaRecorderAudioSlices(stream) {
+function startSmartAudioEngine(stream) {
   try {
-    if (window.MediaRecorder) {
-      const mimeTypes = ['audio/webm', 'audio/ogg', 'audio/mp4', 'audio/wav'];
-      let chosenMime = '';
-      for (const m of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(m)) {
-          chosenMime = m;
-          break;
-        }
+    if (!audioContext) return;
+    speechBuffer = [];
+
+    // Script processor node for audio capture
+    scriptProcessorNode = audioContext.createScriptProcessor(4096, 1, 1);
+    
+    scriptProcessorNode.onaudioprocess = (e) => {
+      if (!isMicActive) return;
+      const input = e.inputBuffer.getChannelData(0);
+      speechBuffer.push(new Float32Array(input));
+    };
+
+    // Create a silent gain node (gain=0) to keep ScriptProcessor running without speaker echo
+    const silentGain = audioContext.createGain();
+    silentGain.gain.value = 0;
+
+    micSource.connect(scriptProcessorNode);
+    scriptProcessorNode.connect(silentGain);
+    silentGain.connect(audioContext.destination);
+
+    // Continuous 2.5s audio slice delivery to Whisper AI
+    clearInterval(pcmProcessorInterval);
+    pcmProcessorInterval = setInterval(() => {
+      if (isMicActive && speechBuffer.length > 0) {
+        flushCurrentUtterance(true);
       }
+    }, 2500);
 
-      const options = chosenMime ? { mimeType: chosenMime } : {};
-      mediaRecorder = new MediaRecorder(stream, options);
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          audioChunks.push(e.data);
-          sendAudioChunkToBackend(e.data);
-        }
-      };
-
-      // Slice audio every 3 seconds for continuous speech recognition
-      mediaRecorder.start(3000);
-      console.log("MediaRecorder audio slice engine active:", chosenMime || "default");
-    }
+    console.log("🎙️ Continuous Real-Time Audio Capture Engine Active.");
   } catch (e) {
-    console.warn("MediaRecorder slice setup note:", e);
+    console.warn("Smart audio engine init notice:", e);
   }
 }
 
-async function sendAudioChunkToBackend(blob) {
-  // If browser has native SpeechRecognition, let it handle real-time streaming to avoid collisions
-  const hasNativeSpeech = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (hasNativeSpeech) return;
+async function flushCurrentUtterance(carryOverlap = true) {
+  if (!isMicActive || speechBuffer.length === 0) {
+    return;
+  }
 
-  if (!isMicActive || blob.size < 1000) return;
+  const currentChunks = speechBuffer;
+  const totalLength = currentChunks.reduce((acc, b) => acc + b.length, 0);
+  if (totalLength < 8000) return; // Ignore snippets under ~0.2s
+
+  const combined = new Float32Array(totalLength);
+  let offset = 0;
+  for (const b of currentChunks) {
+    combined.set(b, offset);
+    offset += b.length;
+  }
+
+  // Carry 300ms overlap to prevent word boundaries clipping
+  if (carryOverlap && totalLength > 14000) {
+    const overlapSamples = Math.floor(audioContext.sampleRate * 0.3);
+    speechBuffer = [combined.slice(totalLength - overlapSamples)];
+  } else {
+    speechBuffer = [];
+  }
+
+  const sampleRate = audioContext ? audioContext.sampleRate : 44100;
+  const wavBlob = encodePcmWav(combined, sampleRate, 16000);
+
+  if (wavBlob.size < 1200) return;
 
   try {
     const formData = new FormData();
-    formData.append("audio", blob, "chunk.wav");
+    formData.append("audio", wavBlob, "utterance.wav");
     formData.append("language", languageSelect.value || "hi-IN");
     formData.append("session_id", sessionIdInput.value.trim());
     formData.append("caller_id", callerNameInput.value.trim());
@@ -455,19 +559,51 @@ async function sendAudioChunkToBackend(blob) {
     });
     const data = await res.json();
     if (data && data.text && data.text.trim()) {
-      const newText = data.text.trim();
-      if (!accumulatedTranscript.includes(newText)) {
-        accumulatedTranscript = (accumulatedTranscript ? accumulatedTranscript + " " : "") + newText;
-        customSpeech.value = accumulatedTranscript;
-        updateLiveSpeechDisplay(accumulatedTranscript, "");
-        speechBoxStatus.textContent = "🟢 Live Voice Transcribed";
-        transmitSpeech(accumulatedTranscript, true);
-      }
+      appendTranscribedText(data.text.trim());
     }
   } catch (err) {
-    console.warn("Backend audio chunk transcription error:", err);
+    console.warn("Whisper speech transcription error:", err);
   }
 }
+
+function appendTranscribedText(newChunk) {
+  const text = newChunk.trim();
+  if (!text) return;
+
+  if (!accumulatedTranscript) {
+    accumulatedTranscript = text;
+  } else {
+    // Intelligent sentence reconciliation between Web Speech & Whisper
+    const currentWords = accumulatedTranscript.split(/\s+/);
+    const newWords = text.split(/\s+/);
+    
+    // Check for overlapping transition words
+    const tail3 = currentWords.slice(-3).join(" ").toLowerCase();
+    const head3 = newWords.slice(0, 3).join(" ").toLowerCase();
+    
+    if (tail3 && head3 && tail3 === head3) {
+      accumulatedTranscript = currentWords.concat(newWords.slice(3)).join(" ");
+    } else if (!accumulatedTranscript.toLowerCase().endsWith(text.toLowerCase())) {
+      // If Whisper transcribed a longer, more complete version of the last short phrase, upgrade it
+      const lastPhrase = currentWords.slice(-newWords.length).join(" ").toLowerCase();
+      if (lastPhrase.length > 0 && text.toLowerCase().includes(lastPhrase)) {
+        accumulatedTranscript = currentWords.slice(0, -newWords.length).concat(newWords).join(" ").trim();
+      } else {
+        accumulatedTranscript = (accumulatedTranscript + " " + text).trim();
+      }
+    }
+  }
+
+  currentInterim = "";
+  customSpeech.value = accumulatedTranscript;
+  updateLiveSpeechDisplay(accumulatedTranscript, "");
+  speechBoxStatus.textContent = "🟢 Live Speech Transcribed (Whisper AI + Zero-Lag Stream)";
+  transmitSpeech(accumulatedTranscript, true);
+}
+
+let highPassFilter = null;
+let lowPassFilter = null;
+let compressorNode = null;
 
 function setupAudioVisualizer(stream) {
   try {
@@ -481,12 +617,44 @@ function setupAudioVisualizer(stream) {
       }
       analyser = audioContext.createAnalyser();
       analyser.fftSize = 128;
+      analyser.smoothingTimeConstant = 0.8;
+
       micSource = audioContext.createMediaStreamSource(stream);
-      micSource.connect(analyser);
+
+      // DSP Stage 1: High-pass Filter (85 Hz cutoff) — cuts fan/AC hum and desk rumble
+      highPassFilter = audioContext.createBiquadFilter();
+      highPassFilter.type = "highpass";
+      highPassFilter.frequency.setValueAtTime(85, audioContext.currentTime);
+      highPassFilter.Q.setValueAtTime(0.7, audioContext.currentTime);
+
+      // DSP Stage 2: Low-pass Filter (3800 Hz cutoff) — cuts high-frequency static hiss
+      lowPassFilter = audioContext.createBiquadFilter();
+      lowPassFilter.type = "lowpass";
+      lowPassFilter.frequency.setValueAtTime(3800, audioContext.currentTime);
+      lowPassFilter.Q.setValueAtTime(0.7, audioContext.currentTime);
+
+      // DSP Stage 3: Dynamics Range Compressor (Subtle noise gating & speech stabilization)
+      compressorNode = audioContext.createDynamicsCompressor();
+      compressorNode.threshold.setValueAtTime(-45, audioContext.currentTime);
+      compressorNode.knee.setValueAtTime(30, audioContext.currentTime);
+      compressorNode.ratio.setValueAtTime(8, audioContext.currentTime);
+      compressorNode.attack.setValueAtTime(0.003, audioContext.currentTime);
+      compressorNode.release.setValueAtTime(0.25, audioContext.currentTime);
+
+      // Connect DSP audio graph: micSource -> HighPass -> LowPass -> Compressor -> Analyser
+      micSource.connect(highPassFilter);
+      highPassFilter.connect(lowPassFilter);
+      lowPassFilter.connect(compressorNode);
+      compressorNode.connect(analyser);
+
       dataArray = new Uint8Array(analyser.frequencyBinCount);
+      console.log("🛡️ Active DSP Noise Filtering & WebRTC Audio Constraints engaged.");
     }
   } catch (e) {
     console.warn("Audio visualizer setup note:", e);
+    if (micSource && analyser) {
+      try { micSource.connect(analyser); } catch (err) {}
+    }
   }
 }
 
@@ -496,8 +664,9 @@ let restartTimeoutId = null;
 function setupSpeechRecognition() {
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRec) {
-    micStatusBanner.innerHTML = "⚠️ <b>Web Speech API is not supported in this browser.</b> Use Google Chrome or Microsoft Edge, or click <b>Auto Voice Stream</b>.";
-    micStatusBanner.className = "mic-status-banner error";
+    webSpeechCloudFailed = true;
+    micStatusBanner.innerHTML = "🎙️ <b>Server-Side Speech Engine Active</b> (Standard browser mode).";
+    micStatusBanner.className = "mic-status-banner";
     return null;
   }
 
@@ -508,39 +677,35 @@ function setupSpeechRecognition() {
   rec.lang = languageSelect ? languageSelect.value : "hi-IN";
 
   rec.onstart = () => {
+    isRecognitionRunning = true;
     isMicActive = true;
     btnToggleMic.classList.add("active");
     micLabel.textContent = "Listening (Tap to Stop)";
     updateCallStatus("recording");
     speechBoxStatus.textContent = "🔴 Listening live... Speak now!";
-    micStatusBanner.innerHTML = "🎙️ <b>Microphone is ACTIVE & listening!</b> Speak in Hindi, English or Hinglish.";
+    micStatusBanner.innerHTML = "🎙️ <b>Microphone is ACTIVE & listening!</b> Speak freely into your mic.";
     micStatusBanner.className = "mic-status-banner";
   };
 
   rec.onresult = (event) => {
-    let sessionFinal = "";
-    let interim = "";
+    lastWebSpeechTime = Date.now();
+    let interimText = "";
 
-    for (let i = 0; i < event.results.length; ++i) {
-      const res = event.results[i];
-      if (res.isFinal) {
-        sessionFinal += res[0].transcript + " ";
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      const chunk = event.results[i][0].transcript;
+      if (event.results[i].isFinal && chunk.trim()) {
+        appendTranscribedText(chunk.trim());
       } else {
-        interim += res[0].transcript;
+        interimText += chunk;
       }
     }
 
-    // Combine persistent past history with current session results
-    const confirmedTotal = (persistentHistory ? persistentHistory + " " : "") + sessionFinal.trim();
-    accumulatedTranscript = confirmedTotal.trim();
-
-    const fullLiveText = accumulatedTranscript + (interim ? (accumulatedTranscript ? " " : "") + interim : "");
-    customSpeech.value = fullLiveText;
-    updateLiveSpeechDisplay(accumulatedTranscript, interim);
-
-    if (fullLiveText.trim()) {
-      speechBoxStatus.textContent = "🟢 Live Speech Transcribed";
-      transmitSpeech(fullLiveText.trim(), Boolean(sessionFinal.trim() && !interim));
+    currentInterim = interimText;
+    if (interimText) {
+      const fullLivePreview = (accumulatedTranscript + " " + interimText).trim();
+      customSpeech.value = fullLivePreview;
+      updateLiveSpeechDisplay(accumulatedTranscript, interimText);
+      transmitSpeech(fullLivePreview, false);
     }
   };
 
@@ -554,28 +719,26 @@ function setupSpeechRecognition() {
     } else if (e.error === "no-speech") {
       speechBoxStatus.textContent = "🎙️ Listening... (Speak clearly into mic)";
     } else if (e.error === "network") {
-      micStatusBanner.innerHTML = "⚠️ <i>Network error reaching cloud speech. Preserving local microphone audio stream...</i>";
+      webSpeechCloudFailed = true;
+      micStatusBanner.innerHTML = "🌐 <b>Dual-Engine Active:</b> Processing voice streams via real-time neural audio backend.";
+      micStatusBanner.className = "mic-status-banner";
     }
   };
 
   rec.onend = () => {
-    // When recognition cycle finishes or pauses, save confirmed text into persistent history
-    if (accumulatedTranscript) {
-      persistentHistory = accumulatedTranscript;
-    }
-
-    // Safe continuous watchdog restart
-    if (isMicActive) {
+    isRecognitionRunning = false;
+    // Auto-restart if mic is still active and cloud recognition hasn't failed permanently
+    if (isMicActive && !webSpeechCloudFailed) {
       clearTimeout(restartTimeoutId);
       restartTimeoutId = setTimeout(() => {
-        if (isMicActive) {
+        if (isMicActive && !isRecognitionRunning) {
           try {
             rec.start();
           } catch (err) {
-            console.log("Watchdog restarted speech recognizer");
+            console.log("Speech recognizer restart handled");
           }
         }
-      }, 120);
+      }, 150);
     }
   };
 
@@ -599,15 +762,24 @@ async function startMicrophone() {
   }
 
   isMicActive = true;
+  webSpeechCloudFailed = false;
   persistentHistory = accumulatedTranscript || "";
+  
   const hasAudio = await requestMicPermissionAndAudio();
   if (!hasAudio) return;
+
+  btnToggleMic.classList.add("active");
+  micLabel.textContent = "Listening (Tap to Stop)";
+  updateCallStatus("recording");
+  speechBoxStatus.textContent = "🔴 Listening live... Speak now!";
+  micStatusBanner.innerHTML = "🎙️ <b>Microphone ACTIVE!</b> Speak clearly into your mic.";
+  micStatusBanner.className = "mic-status-banner";
 
   if (!recognition) {
     recognition = setupSpeechRecognition();
   }
 
-  if (recognition) {
+  if (recognition && !isRecognitionRunning) {
     try {
       recognition.lang = languageSelect ? languageSelect.value : "hi-IN";
       recognition.start();
@@ -632,9 +804,16 @@ function stopMicrophone() {
 
   if (recognition) {
     try {
+      recognition.abort();
+    } catch (e) {}
+    try {
       recognition.stop();
     } catch (e) {}
   }
+  isRecognitionRunning = false;
+  clearTimeout(restartTimeoutId);
+  clearInterval(pcmProcessorInterval);
+  speechBuffer = [];
 
   if (mediaRecorder && mediaRecorder.state !== "inactive") {
     try {
@@ -644,7 +823,6 @@ function stopMicrophone() {
   }
   audioChunks = [];
 
-  // Release the mic stream so the browser frees the device
   if (micStream) {
     micStream.getTracks().forEach(track => track.stop());
     micStream = null;

@@ -135,7 +135,7 @@ def run_training() -> dict:
 
 if __name__ == "__main__":
     # Reconfigure stdout for Windows
-    if sys.platform == "win32":
+    if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
     print("=" * 55)

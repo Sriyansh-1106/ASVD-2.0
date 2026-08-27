@@ -1,6 +1,5 @@
 """Unit tests for ASVD NLP Indicator Detection Engine."""
 
-import pytest
 from backend.app.detection.indicators import detect_indicators
 
 

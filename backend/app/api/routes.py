@@ -65,12 +65,27 @@ from backend.app.api.websocket import manager
 
 @router.post("/analyse", response_model=AnalyseResponse)
 async def analyse_text(request: AnalyseRequest):
-    """Analyse conversation text for cyber scam indicators and risk score."""
-    assessment = assess_risk(request.text)
-    
+    """Analyse conversation text for cyber scam indicators and risk score.
+
+    When a session_id is provided, the incoming text is accumulated into the
+    session's SpeechPipeline so the **full cumulative conversation** is analysed
+    (not just the latest chunk). This ensures risk scoring improves progressively
+    as the call continues, rather than resetting on every new transcript chunk.
+    """
+    # ------------------------------------------------------------------
+    # Build cumulative transcript using the session's SpeechPipeline
+    # ------------------------------------------------------------------
+    if request.session_id and request.text.strip():
+        pipeline = manager.get_pipeline(request.session_id)
+        cumulative_text = pipeline.add_transcript_chunk(request.text)
+    else:
+        cumulative_text = request.text
+
+    assessment = assess_risk(cumulative_text)
+
     # Persist analysis to database
     record_id = save_analysis(
-        conversation_text=request.text,
+        conversation_text=cumulative_text,
         assessment=assessment,
         session_id=request.session_id,
         caller_id=request.caller_id,
@@ -82,14 +97,15 @@ async def analyse_text(request: AnalyseRequest):
             "type": "threat_alert",
             "session_id": request.session_id,
             "chunk": request.text,
-            "full_transcript": request.text,
+            "full_transcript": cumulative_text,
             "data": assessment,
         })
-    
+
     return {
         "id": record_id,
         **assessment,
     }
+
 
 
 @router.get("/stats")
@@ -112,7 +128,7 @@ def get_system_stats():
     }
 
 
-from fastapi import Request, UploadFile, File, Form
+from fastapi import UploadFile, File, Form
 from backend.app.speech.speech_to_text import transcribe_audio_chunk
 
 @router.post("/speech_to_text")
