@@ -241,6 +241,18 @@ class TestReturnFormat:
         result = detect_indicators("Turant Rs 50,000 bhej do, OTP bhi batao")
         assert result["indicator_count"] == len(result["detected_list"])
 
+    def test_detect_safe_conversation(self):
+        text = "Mummy main sham ko 7 baje ghar aaunga, dinner sath mein karenge"
+        res = detect_indicators(text)
+        assert res["indicator_count"] == 0
+        assert len(res["detected_list"]) == 0
+
+    def test_detect_hospital_emergency_manipulation(self):
+        text = "Unki tabiyat bahut kharab hai hospital mein admit hai please paise bhejo"
+        res = detect_indicators(text)
+        assert res["emotional_manipulation"] is True
+        assert "emotional_manipulation" in res["detected_list"]
+
     def test_safe_message_has_zero_indicators(self):
         result = detect_indicators("Aaj ka dinner bahut achha tha")
         assert result["indicator_count"] == 0

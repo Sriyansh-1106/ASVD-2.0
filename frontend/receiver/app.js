@@ -240,6 +240,7 @@ function renderHighlightedTranscript(text) {
     "otp", "pin", "cvv", "password", "arrest", "jail", "fir", "police",
     "inspector", "cbi", "cyber crime", "transfer", "paisa", "rupees", "rs",
     "urgent", "argent", "turant", "jaldi", "block", "freeze", "emergency", "accident",
+    "hospital", "haspatal", "admit", "tabiyat", "tabiat", "doctor", "surgery", "operation", "icu",
     "kidnap", "kidnapping", "marunga", "maar", "kill", "firauti", "ransom", "500000", "lakh"
   ];
 

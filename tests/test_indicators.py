@@ -58,3 +58,11 @@ def test_detect_safe_conversation():
     res = detect_indicators(text)
     assert res["indicator_count"] == 0
     assert len(res["detected_list"]) == 0
+
+
+def test_detect_hospital_emergency_manipulation():
+    text = "Unki tabiyat bahut kharab hai hospital mein admit hai please paise bhejo"
+    res = detect_indicators(text)
+    assert res["emotional_manipulation"] is True
+    assert "emotional_manipulation" in res["detected_list"]
+

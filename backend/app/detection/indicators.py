@@ -205,6 +205,7 @@ THREAT_PATTERNS = {
         r"\b(marunga|maar dunga|maar dalunga|mar dalenge|khatam kar dunga|goli mar dunga|jaan se|chhodunga nahi)\b",
         r"\b(bahut marunga|jaan se mar|laash)\b",
         r"\b(harm|kill|murder|dead|torture|shoot|beat)\b",
+        r"\b(mar jayega|mar jayenge|jaan khatre mein|serious halat|bach nahi payega)\b",
 
         # Legal & Arrest Threats
         r"\barrest\b", r"\bjail\b", r"\bwarrant\b",
@@ -254,6 +255,13 @@ EMOTIONAL_PATTERNS = {
         r"\bbahut zaroorat\b", r"\bdesperate\b",
         r"\bI am in\b.*\b(trouble|danger)\b",
         r"\b(bete|beti|baccha)\b.*\b(bachao|chhod do|khatre mein)\b",
+        # Medical, Accident & Hospital Emergency Extortion / Scam Vectors
+        r"\b(hospital|haspatal)\b.*\b(admit|admit hai|serious|emergency|operation|surgery|doctor)\b",
+        r"\b(tabiyat|tabiat)\b.*\b(kharab|bahut kharab|serious|critical|kharab hai)\b",
+        r"\b(accident|accident ho gaya|takkar|chot lagi|ghayal)\b",
+        r"\b(operation|surgery|blood|icu|oxygen|treatment)\b.*\b(chahiye|paise|urgent|turant|admit|karna hai)\b",
+        r"\b(papa|mummy|bhai|sister|dost|uncle|aunty)\b.*\b(hospital|admit|serious|tabiyat|accident)\b",
+        r"\b(admit hai|admit karwaya|admit kiya)\b",
         r"\bguaranteed\b.*\b(return|profit|income)\b",
         r"\bdouble\b.*\b(money|paise|paisa)\b",
         r"\b100%\s*(safe|legal|guaranteed)\b",

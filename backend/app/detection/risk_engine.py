@@ -135,7 +135,7 @@ def _generate_action(label: str, indicators: list) -> str:
 
     if "emotional_manipulation" in indicators:
         actions.append(
-            "Stay calm. Scammers use emotional pressure to prevent rational thinking."
+            "Stay calm. Scammers fabricate fake hospital emergencies, accidents, or distress to extort money. Directly call your family member to verify."
         )
 
     if not actions:
