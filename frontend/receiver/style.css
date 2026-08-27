@@ -1,12 +1,13 @@
 :root {
-  --bg-base: #f8fafc;
+  --bg-base: #eef2f6;
   --bg-surface: #ffffff;
   --bg-card: #ffffff;
   --bg-card-elevated: #ffffff;
   --bg-input: #ffffff;
   --bg-subtle: #f1f5f9;
 
-  --border-subtle: #e2e8f0;
+  --border-subtle: #cbd5e1;
+  --border-card: #e2e8f0;
   --border-focus: #2563eb;
   
   --primary: #2563eb;
@@ -30,16 +31,15 @@
   --text-muted: #475569;
   --text-dim: #94a3b8;
   
-  --radius-2xl: 24px;
-  --radius-xl: 18px;
-  --radius-lg: 14px;
-  --radius-md: 10px;
+  --radius-2xl: 22px;
+  --radius-xl: 16px;
+  --radius-lg: 12px;
+  --radius-md: 8px;
   --radius-sm: 6px;
 
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 6px 20px -4px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-  --shadow-lg: 0 20px 45px -8px rgba(15, 23, 42, 0.10);
-  --shadow-danger: 0 10px 30px rgba(225, 29, 72, 0.15);
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 8px 24px -4px rgba(15, 23, 42, 0.08), 0 3px 8px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 45px -8px rgba(15, 23, 42, 0.12);
 }
 
 * {
@@ -53,14 +53,14 @@ body {
   background-color: var(--bg-base);
   color: var(--text-main);
   min-height: 100vh;
-  padding: 28px 20px;
+  padding: 24px 20px;
   display: flex;
   justify-content: center;
   position: relative;
   overflow-x: hidden;
 }
 
-/* Ambient Background Mesh */
+/* Ambient Silver-Slate Mesh Background */
 body::before {
   content: '';
   position: fixed;
@@ -69,9 +69,9 @@ body::before {
   width: 180%;
   height: 180%;
   background: 
-    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.06) 0%, transparent 45%),
-    radial-gradient(circle at 85% 85%, rgba(225, 29, 72, 0.05) 0%, transparent 48%),
-    radial-gradient(circle at 50% 50%, rgba(5, 150, 105, 0.04) 0%, transparent 50%);
+    radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(225, 29, 72, 0.07) 0%, transparent 48%),
+    radial-gradient(circle at 50% 50%, rgba(5, 150, 105, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: -2;
 }
@@ -84,33 +84,156 @@ body::after {
   width: 100%;
   height: 100%;
   background-image: 
-    linear-gradient(rgba(226, 232, 240, 0.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 232, 240, 0.5) 1px, transparent 1px);
+    linear-gradient(rgba(203, 213, 225, 0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(203, 213, 225, 0.4) 1px, transparent 1px);
   background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 75%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 75%, transparent 100%);
+  mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.25) 75%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.25) 75%, transparent 100%);
   pointer-events: none;
   z-index: -1;
 }
 
 .hud-container {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1100px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 18px;
 }
 
-/* Navbar */
-.hud-navbar {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-2xl);
-  padding: 18px 26px;
+/* ==================================================================== */
+/* PROMINENT EMERGENCY FLASHING WARNING LIGHT BAR                       */
+/* ==================================================================== */
+
+.emergency-light-bar {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.strobe-cluster {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.strobe-bulb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  transition: all 0.15s ease;
+}
+
+.strobe-bulb.yellow-bulb {
+  background: #fde68a;
+  border: 1px solid #d97706;
+}
+
+.strobe-bulb.red-bulb {
+  background: #fecdd3;
+  border: 1px solid #e11d48;
+}
+
+.light-bar-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+/* Light Bar States */
+.emergency-light-bar.safe {
+  border-color: var(--threat-low-border);
+  background: var(--threat-low-bg);
+  color: var(--threat-low);
+}
+
+.emergency-light-bar.safe .strobe-bulb {
+  opacity: 0.3;
+}
+
+/* WARNING STATE: Rapid Flashing Yellow Lights */
+.emergency-light-bar.warning {
+  border-color: var(--threat-med);
+  background: var(--threat-med-bg);
+  color: var(--threat-med);
+  box-shadow: 0 0 25px rgba(217, 119, 6, 0.35);
+}
+
+.emergency-light-bar.warning .yellow-bulb {
+  background: #fbbf24;
+  border-color: #ffffff;
+  box-shadow: 0 0 16px #fbbf24, 0 0 30px rgba(217, 119, 6, 0.9);
+  animation: strobe-yellow-flash 0.35s infinite alternate ease-in-out;
+}
+
+.emergency-light-bar.warning .red-bulb {
+  opacity: 0.25;
+}
+
+/* CRITICAL STATE: High-Power Alternating Red & Yellow Police Emergency Strobe */
+.emergency-light-bar.critical {
+  border-color: var(--threat-critical);
+  background: var(--threat-critical-bg);
+  color: var(--threat-critical);
+  box-shadow: 0 0 35px rgba(225, 29, 72, 0.4), 0 0 60px rgba(217, 119, 6, 0.25);
+  animation: light-bar-glow 0.6s infinite alternate;
+}
+
+.emergency-light-bar.critical .red-bulb {
+  background: #ff1155;
+  border-color: #ffffff;
+  box-shadow: 0 0 20px #ff1155, 0 0 35px rgba(225, 29, 72, 1);
+  animation: strobe-red-flash 0.22s infinite alternate ease-in-out;
+}
+
+.emergency-light-bar.critical .yellow-bulb {
+  background: #fbbf24;
+  border-color: #ffffff;
+  box-shadow: 0 0 20px #fbbf24, 0 0 35px rgba(217, 119, 6, 1);
+  animation: strobe-yellow-flash 0.22s infinite alternate ease-in-out 0.11s;
+}
+
+@keyframes strobe-yellow-flash {
+  0% { transform: scale(0.85); opacity: 0.35; filter: brightness(0.7); }
+  100% { transform: scale(1.35); opacity: 1; filter: brightness(1.5); }
+}
+
+@keyframes strobe-red-flash {
+  0% { transform: scale(0.85); opacity: 0.35; filter: brightness(0.7); }
+  100% { transform: scale(1.35); opacity: 1; filter: brightness(1.5); }
+}
+
+@keyframes light-bar-glow {
+  0% { border-color: rgba(225, 29, 72, 0.4); }
+  100% { border-color: rgba(225, 29, 72, 0.9); }
+}
+
+/* ==================================================================== */
+/* NAVBAR                                                               */
+/* ==================================================================== */
+
+.hud-navbar {
+  background: #ffffff;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-xl);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
   flex-wrap: wrap;
   gap: 16px;
 }
@@ -122,8 +245,8 @@ body::after {
 }
 
 .shield-badge {
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--primary), #3b82f6);
   display: flex;
@@ -135,7 +258,7 @@ body::after {
 }
 
 .brand-section h1 {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.3px;
   color: var(--text-main);
@@ -149,105 +272,48 @@ body::after {
 .system-status-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
-/* Continuous Yellow & Red Corner Emergency Strobe Beacon */
 .beacon-widget {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: var(--bg-subtle);
-  padding: 7px 16px;
-  border-radius: 30px;
-  border: 1px solid var(--border-subtle);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-card);
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  transition: all 0.3s ease;
 }
 
 .beacon-light {
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  position: relative;
-  transition: all 0.2s ease;
 }
 
-.beacon-light.yellow-light {
-  background: #fde68a;
-  border: 1px solid #d97706;
-}
+.beacon-light.yellow-light { background: #fde68a; }
+.beacon-light.red-light { background: #fecdd3; }
 
-.beacon-light.red-light {
-  background: #fecdd3;
-  border: 1px solid #e11d48;
-}
-
-/* Beacon State: SAFE (Passive) */
 .beacon-widget.safe {
   border-color: var(--threat-low-border);
-  background: var(--threat-low-bg);
   color: var(--threat-low);
+  background: var(--threat-low-bg);
 }
 
-.beacon-widget.safe .yellow-light,
-.beacon-widget.safe .red-light {
-  opacity: 0.35;
-}
-
-/* Beacon State: WARNING (Continuous Yellow / Amber Strobe) */
 .beacon-widget.warning {
   border-color: var(--threat-med);
-  background: var(--threat-med-bg);
   color: var(--threat-med);
-  box-shadow: 0 0 20px rgba(217, 119, 6, 0.25);
+  background: var(--threat-med-bg);
 }
 
-.beacon-widget.warning .yellow-light {
-  background: #d97706;
-  border-color: #ffffff;
-  box-shadow: 0 0 14px #d97706, 0 0 25px rgba(217, 119, 6, 0.6);
-  animation: strobe-yellow-blink 0.4s infinite alternate ease-in-out;
-}
-
-.beacon-widget.warning .red-light {
-  opacity: 0.25;
-}
-
-/* Beacon State: CRITICAL (Continuous High-Speed Red & Yellow Strobe) */
 .beacon-widget.critical {
   border-color: var(--threat-critical);
-  background: var(--threat-critical-bg);
   color: var(--threat-critical);
-  box-shadow: 0 0 25px rgba(225, 29, 72, 0.3), 0 0 40px rgba(217, 119, 6, 0.2);
-}
-
-.beacon-widget.critical .red-light {
-  background: #e11d48;
-  border-color: #ffffff;
-  box-shadow: 0 0 16px #e11d48, 0 0 30px rgba(225, 29, 72, 0.7);
-  animation: strobe-red-blink 0.25s infinite alternate ease-in-out;
-}
-
-.beacon-widget.critical .yellow-light {
-  background: #d97706;
-  border-color: #ffffff;
-  box-shadow: 0 0 16px #d97706, 0 0 30px rgba(217, 119, 6, 0.7);
-  animation: strobe-yellow-blink 0.25s infinite alternate ease-in-out 0.12s;
-}
-
-@keyframes strobe-yellow-blink {
-  0% { transform: scale(0.85); opacity: 0.4; }
-  100% { transform: scale(1.25); opacity: 1; filter: brightness(1.3); }
-}
-
-@keyframes strobe-red-blink {
-  0% { transform: scale(0.85); opacity: 0.4; }
-  100% { transform: scale(1.25); opacity: 1; filter: brightness(1.3); }
+  background: var(--threat-critical-bg);
 }
 
 .session-chip {
@@ -255,9 +321,9 @@ body::after {
   font-size: 12px;
   font-weight: 700;
   background: var(--bg-subtle);
-  padding: 7px 14px;
+  padding: 6px 12px;
   border-radius: 20px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   color: var(--text-main);
 }
 
@@ -268,25 +334,25 @@ body::after {
   font-size: 12px;
   font-weight: 700;
   background: var(--bg-subtle);
-  padding: 7px 14px;
+  padding: 6px 12px;
   border-radius: 20px;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   color: var(--text-main);
   font-family: 'JetBrains Mono', monospace;
 }
 
 .pulse-dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--threat-low);
-  box-shadow: 0 0 8px var(--threat-low);
+  box-shadow: 0 0 6px var(--threat-low);
   animation: pulse-ring 1.5s infinite alternate;
 }
 
 .pulse-dot.danger {
   background: var(--threat-critical);
-  box-shadow: 0 0 10px var(--threat-critical);
+  box-shadow: 0 0 8px var(--threat-critical);
 }
 
 @keyframes pulse-ring {
@@ -296,9 +362,9 @@ body::after {
 
 .btn-ghost {
   background: #ffffff;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   color: var(--text-main);
-  padding: 7px 16px;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 700;
@@ -306,8 +372,8 @@ body::after {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
   box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 }
 
 .btn-ghost:hover {
@@ -315,14 +381,17 @@ body::after {
   transform: translateY(-1px);
 }
 
-/* Main Grid */
+/* ==================================================================== */
+/* MAIN HUD GRID                                                        */
+/* ==================================================================== */
+
 .hud-grid {
   display: grid;
-  grid-template-columns: 330px 1fr;
-  gap: 22px;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
 }
 
-@media (max-width: 880px) {
+@media (max-width: 860px) {
   .hud-grid {
     grid-template-columns: 1fr;
   }
@@ -330,29 +399,29 @@ body::after {
 
 /* Left Column: Gauge Panel */
 .threat-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-2xl);
-  padding: 28px;
+  padding: 26px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 18px;
   box-shadow: var(--shadow-md);
   position: relative;
   overflow: hidden;
-  transition: all 0.28s ease;
+  transition: all 0.25s ease;
 }
 
 .threat-panel.critical {
   border-color: var(--threat-critical-border);
-  box-shadow: 0 0 40px rgba(225, 29, 72, 0.18);
+  box-shadow: 0 0 35px rgba(225, 29, 72, 0.18);
   background: var(--threat-critical-bg);
 }
 
 .threat-panel.high {
   border-color: var(--threat-high-border);
-  box-shadow: 0 0 35px rgba(234, 88, 12, 0.15);
+  box-shadow: 0 0 30px rgba(234, 88, 12, 0.14);
   background: var(--threat-high-bg);
 }
 
@@ -360,7 +429,7 @@ body::after {
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.8px;
   color: var(--text-muted);
   font-family: 'JetBrains Mono', monospace;
 }
@@ -368,8 +437,8 @@ body::after {
 /* Gauge SVG */
 .gauge-wrapper {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 190px;
+  height: 190px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -384,13 +453,13 @@ body::after {
 .gauge-bg {
   fill: none;
   stroke: var(--bg-subtle);
-  stroke-width: 15;
+  stroke-width: 14;
 }
 
 .gauge-progress {
   fill: none;
   stroke: var(--threat-low);
-  stroke-width: 15;
+  stroke-width: 14;
   stroke-linecap: round;
   stroke-dasharray: 565.48;
   stroke-dashoffset: 565.48;
@@ -408,7 +477,7 @@ body::after {
 
 .score-number {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 54px;
+  font-size: 50px;
   font-weight: 900;
   color: var(--text-main);
   line-height: 1;
@@ -451,7 +520,7 @@ body::after {
 .caller-meta {
   width: 100%;
   background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
   padding: 12px 14px;
   display: flex;
@@ -473,18 +542,18 @@ body::after {
 .defense-center {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 20px;
 }
 
 /* Indicators Matrix */
 .indicators-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-2xl);
-  padding: 24px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   box-shadow: var(--shadow-md);
 }
 
@@ -505,13 +574,13 @@ body::after {
 
 .indicators-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 10px;
 }
 
 .indicator-chip {
   background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
   padding: 10px 12px;
   display: flex;
@@ -542,27 +611,27 @@ body::after {
 
 /* Live Intercepted Transcript Feed */
 .transcript-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-2xl);
-  padding: 24px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   box-shadow: var(--shadow-md);
-  min-height: 200px;
+  min-height: 190px;
 }
 
 .transcript-feed {
   background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-lg);
-  padding: 16px;
-  min-height: 120px;
-  max-height: 200px;
+  padding: 14px;
+  min-height: 110px;
+  max-height: 190px;
   overflow-y: auto;
   font-size: 15px;
-  line-height: 1.65;
+  line-height: 1.6;
   color: var(--text-main);
 }
 
@@ -582,14 +651,14 @@ body::after {
 
 /* Action Banner */
 .action-banner {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-2xl);
-  padding: 20px 24px;
+  padding: 18px 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
   box-shadow: var(--shadow-md);
   flex-wrap: wrap;
 }
@@ -621,7 +690,7 @@ body::after {
 .btn-emergency {
   background: var(--threat-critical);
   color: #ffffff;
-  padding: 11px 22px;
+  padding: 10px 20px;
   border-radius: var(--radius-md);
   border: none;
   font-weight: 800;
@@ -630,7 +699,7 @@ body::after {
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.25);
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
   text-decoration: none;
   transition: all 0.2s ease;
 }
@@ -665,7 +734,7 @@ body::after {
   max-width: 640px;
   max-height: 80vh;
   background: #ffffff;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-2xl);
   padding: 26px;
   display: flex;
@@ -704,7 +773,7 @@ body::after {
 
 .history-item {
   background: var(--bg-subtle);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-card);
   border-radius: var(--radius-md);
   padding: 12px 14px;
   display: flex;

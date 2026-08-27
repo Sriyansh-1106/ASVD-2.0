@@ -6,28 +6,45 @@
   <title>ASVD 2.0 - Receiver Threat Defense HUD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=2.2">
 </head>
 <body>
 
   <div class="hud-container">
+    
+    <!-- Prominent Emergency Flashing Warning Light Bar -->
+    <div class="emergency-light-bar safe" id="emergencyLightBar">
+      <div class="strobe-cluster">
+        <span class="strobe-bulb red-bulb"></span>
+        <span class="strobe-bulb yellow-bulb"></span>
+      </div>
+      <div class="light-bar-status">
+        <span class="light-bar-icon" id="lightBarIcon">🛡️</span>
+        <span class="light-bar-title" id="lightBarTitle">SYSTEM SECURE — CALL MONITORING NORMAL</span>
+      </div>
+      <div class="strobe-cluster">
+        <span class="strobe-bulb yellow-bulb"></span>
+        <span class="strobe-bulb red-bulb"></span>
+      </div>
+    </div>
+
     <!-- Top Status Bar -->
     <header class="hud-navbar">
       <div class="brand-section">
         <div class="shield-badge">🛡️</div>
         <div>
-          <h1>ASVD 2.O Threat Defense HUD</h1>
+          <h1>ASVD 2.0 Threat Defense HUD</h1>
           <p>AI Scam Voice & Social Engineering Detection Engine</p>
         </div>
       </div>
 
       <div class="system-status-group">
-        <!-- Continuous Yellow / Red Corner Emergency Strobe Beacon -->
+        <!-- Corner Beacon -->
         <div class="beacon-widget safe" id="cornerBeacon">
           <div class="beacon-light red-light" id="beaconRed"></div>
           <div class="beacon-light yellow-light" id="beaconYellow"></div>
-          <span class="beacon-label" id="beaconText">DEFENSE IDLE</span>
+          <span class="beacon-label" id="beaconText">DEFENSE NORMAL</span>
         </div>
 
         <div class="session-chip" id="sessionChip">
@@ -62,95 +79,104 @@
           </div>
         </div>
 
-        <div class="threat-level-badge" id="threatLevelBadge">LOW THREAT</div>
+        <div class="threat-level-badge" id="threatLevelBadge">SAFE CALL</div>
 
         <div class="caller-meta">
           <div class="meta-row">
-            <span class="meta-key">Incoming Caller:</span>
-            <span class="meta-val" id="callerIdentity">Unknown Caller</span>
+            <span class="meta-label">Caller:</span>
+            <span class="meta-value" id="callerIdentity">+91 98765 43210</span>
           </div>
           <div class="meta-row">
-            <span class="meta-key">AI Confidence:</span>
-            <span class="meta-val" id="aiConfidence">100%</span>
+            <span class="meta-label">AI Confidence:</span>
+            <span class="meta-value" id="aiConfidence">--%</span>
           </div>
           <div class="meta-row">
-            <span class="meta-key">Threat Flags:</span>
-            <span class="meta-val" id="flagCount">0 Detected</span>
+            <span class="meta-label">Threat Flags:</span>
+            <span class="meta-value" id="flagCount">0 Flagged</span>
           </div>
         </div>
       </aside>
 
-      <!-- Right Column: Live Transcript, Indicators, Protective Actions -->
-      <section class="right-column">
-        
-        <!-- Live Call Transcript Card -->
-        <div class="transcript-card">
-          <div class="card-header">
-            <h2>Live Speech Transcript</h2>
-            <div class="live-indicator">
-              <span class="pulse-dot"></span>
-              <span>STREAMING</span>
+      <!-- Right Column: Defense Center Matrix & Live Feed -->
+      <section class="defense-center">
+
+        <!-- 8 Active Threat Indicators Matrix -->
+        <div class="indicators-card">
+          <div class="card-header-flex">
+            <span class="card-title">🚨 Active Cyber Threat Indicators</span>
+            <span style="font-size: 11px; color: var(--text-dim); font-family: monospace;">Multi-Turn Vector Scan</span>
+          </div>
+          <div class="indicators-grid">
+            <div class="indicator-chip" id="ind-urgency">
+              <span class="icon">⏱️</span> <span>Urgency & Panic</span>
             </div>
-          </div>
-
-          <div class="transcript-feed" id="transcriptFeed">
-            <span class="transcript-placeholder">Waiting for incoming call audio or speech transcript from Device 1...</span>
-          </div>
-
-          <!-- Indicators Badge Grid -->
-          <div class="indicators-section">
-            <div class="panel-title" style="font-size: 11px;">Detected Threat Indicators</div>
-            <div class="indicators-grid" id="indicatorsGrid">
-              <div class="indicator-chip" id="ind-urgency">⏳ Urgency Pressure</div>
-              <div class="indicator-chip" id="ind-otp">🔑 OTP Request</div>
-              <div class="indicator-chip" id="ind-credential">💳 PIN / Password</div>
-              <div class="indicator-chip" id="ind-authority">👮 Authority Impersonation</div>
-              <div class="indicator-chip" id="ind-threat">⚠️ Threat / Extortion</div>
-              <div class="indicator-chip" id="ind-financial">💸 Money / UPI Transfer</div>
-              <div class="indicator-chip" id="ind-secrecy">🤫 Secrecy / Isolation</div>
-              <div class="indicator-chip" id="ind-emotional">🎭 Emotional Pressure</div>
+            <div class="indicator-chip" id="ind-otp">
+              <span class="icon">🔑</span> <span>OTP Theft Request</span>
+            </div>
+            <div class="indicator-chip" id="ind-credential">
+              <span class="icon">🔒</span> <span>Password / PIN Demand</span>
+            </div>
+            <div class="indicator-chip" id="ind-authority">
+              <span class="icon">👮</span> <span>Police / CBI / Govt</span>
+            </div>
+            <div class="indicator-chip" id="ind-threat">
+              <span class="icon">⚠️</span> <span>Arrest / Kidnap / Threat</span>
+            </div>
+            <div class="indicator-chip" id="ind-financial">
+              <span class="icon">💸</span> <span>Money / UPI Transfer</span>
+            </div>
+            <div class="indicator-chip" id="ind-secrecy">
+              <span class="icon">🤫</span> <span>Secrecy / Isolation</span>
+            </div>
+            <div class="indicator-chip" id="ind-emotional">
+              <span class="icon">🎭</span> <span>Emotional Coercion</span>
             </div>
           </div>
         </div>
 
-        <!-- AI Guidance & Emergency Actions -->
-        <div class="action-banner" id="actionBanner">
-          <div class="action-header">
-            <span>🛡️</span> <span id="actionTitle">AI Security Guidance</span>
+        <!-- Live Intercepted Transcript Stream -->
+        <div class="transcript-card">
+          <div class="card-header-flex">
+            <span class="card-title">🎙️ Intercepted Call Stream</span>
+            <span style="font-size: 11px; color: var(--text-dim); font-family: monospace;">Real-Time NLP Pipeline</span>
           </div>
-          <p class="action-text" id="actionAdvice">
-            No threat detected. This conversation appears safe.
-          </p>
-          <div class="emergency-actions-row">
-            <button class="btn-emergency" id="btnEndCall" onclick="alert('Call terminated safely.')">
-              <span>🛑</span> Hang Up Call
-            </button>
-            <button class="btn-helpline" onclick="window.open('tel:1930')">
-              <span>🚨</span> National Cyber Helpline 1930
-            </button>
-            <button class="btn-ghost" onclick="toggleAudioAlarm()">
-              <span>🔔</span> <span id="alarmBtnText">Toggle Warning Siren</span>
-            </button>
+          <div class="transcript-feed" id="transcriptFeed">
+            <span class="transcript-placeholder">Listening for speech stream from Caller Device...</span>
+          </div>
+        </div>
+
+        <!-- Emergency Action & Recommended Defense Protocol -->
+        <div class="action-banner" id="actionBanner">
+          <div class="action-info">
+            <h3 id="actionTitle">🛡️ AI Security Protocol</h3>
+            <p id="actionAdvice">Awaiting conversation stream. Real-time safety advice will appear here.</p>
+          </div>
+          <div class="action-buttons">
+            <a href="tel:1930" class="btn-emergency" title="National Cyber Crime Reporting Helpline">
+              <span>📞</span> Call 1930 Helpline
+            </a>
           </div>
         </div>
 
       </section>
-    </main>
-  </div>
 
-  <!-- History Modal -->
-  <div class="modal-backdrop" id="historyModal">
-    <div class="modal-card">
-      <div class="card-header">
-        <h2>Recent Threat Logs & Call History</h2>
-        <button class="btn-ghost" id="btnCloseHistory">✕ Close</button>
-      </div>
-      <div class="history-list" id="historyList">
-        <p style="color: var(--text-dim);">Loading logs...</p>
+    </main>
+
+    <!-- Call Log History Drawer Modal -->
+    <div class="modal-overlay" id="historyModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>📜 Historical Threat Assessment Logs</h2>
+          <button class="btn-close" id="btnCloseHistory">&times;</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <p style="color: var(--text-dim);">Loading past call history...</p>
+        </div>
       </div>
     </div>
+
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2.2"></script>
 </body>
 </html>

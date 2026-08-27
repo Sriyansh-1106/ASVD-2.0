@@ -2,9 +2,6 @@
 
 let ws = null;
 let currentScore = 0;
-let alarmAudioContext = null;
-let alarmOscillator = null;
-let isAlarmMuted = false;
 
 // DOM Elements
 const systemStatusText = document.getElementById("systemStatusText");
@@ -126,6 +123,9 @@ function updateThreatHUD(data, transcriptText) {
   systemPulse.className = "pulse-dot";
   threatLevelBadge.className = "threat-level-badge";
 
+  const lightBar = document.getElementById("emergencyLightBar");
+  const lightBarIcon = document.getElementById("lightBarIcon");
+  const lightBarTitle = document.getElementById("lightBarTitle");
   const beaconWidget = document.getElementById("cornerBeacon");
   const beaconText = document.getElementById("beaconText");
 
@@ -137,7 +137,12 @@ function updateThreatHUD(data, transcriptText) {
     threatLevelBadge.classList.add("critical");
     threatLevelBadge.textContent = "🚨 CRITICAL THREAT";
     
-    // Activate Continuous Rapid Red & Yellow Strobe
+    // Activate Continuous High-Power Red & Yellow Flashing Emergency Strobe
+    if (lightBar) {
+      lightBar.className = "emergency-light-bar critical";
+      if (lightBarIcon) lightBarIcon.textContent = "🚨";
+      if (lightBarTitle) lightBarTitle.textContent = "CRITICAL THREAT DETECTED — EMERGENCY FLASHING LIGHTS ACTIVE";
+    }
     if (beaconWidget) {
       beaconWidget.className = "beacon-widget critical";
       if (beaconText) beaconText.textContent = "🚨 CRITICAL STROBE";
@@ -149,7 +154,12 @@ function updateThreatHUD(data, transcriptText) {
     systemPulse.classList.add("danger");
     threatLevelBadge.textContent = "⚠️ HIGH THREAT";
 
-    // Activate Continuous Red & Yellow Strobe
+    // Activate Flashing Red & Yellow Strobe
+    if (lightBar) {
+      lightBar.className = "emergency-light-bar critical";
+      if (lightBarIcon) lightBarIcon.textContent = "⚠️";
+      if (lightBarTitle) lightBarTitle.textContent = "HIGH SCAM RISK DETECTED — FLASHING WARNING ACTIVE";
+    }
     if (beaconWidget) {
       beaconWidget.className = "beacon-widget critical";
       if (beaconText) beaconText.textContent = "⚠️ THREAT STROBE";
@@ -158,29 +168,37 @@ function updateThreatHUD(data, transcriptText) {
     gaugeProgress.style.stroke = "var(--threat-med)";
     threatLevelBadge.textContent = "⚡ MEDIUM RISK";
     threatLevelBadge.style.color = "var(--threat-med)";
-    threatLevelBadge.style.borderColor = "var(--threat-med)";
-    threatLevelBadge.style.background = "rgba(255, 204, 0, 0.15)";
+    threatLevelBadge.style.borderColor = "var(--threat-med-border)";
+    threatLevelBadge.style.background = "var(--threat-med-bg)";
 
-    // Activate Continuous Yellow / Amber Warning Light
+    // Activate Continuous Flashing Yellow Warning Strobe
+    if (lightBar) {
+      lightBar.className = "emergency-light-bar warning";
+      if (lightBarIcon) lightBarIcon.textContent = "🟡";
+      if (lightBarTitle) lightBarTitle.textContent = "CAUTION: SUSPICIOUS CALL INDICATORS — YELLOW LIGHT ACTIVE";
+    }
     if (beaconWidget) {
       beaconWidget.className = "beacon-widget warning";
       if (beaconText) beaconText.textContent = "🟡 WARNING BEACON";
     }
-    stopSiren();
   } else {
     gaugeProgress.style.stroke = "var(--threat-low)";
     threatPanel.classList.add("safe");
     threatLevelBadge.textContent = "🛡️ SAFE CALL";
     threatLevelBadge.style.color = "var(--threat-low)";
-    threatLevelBadge.style.borderColor = "var(--threat-low)";
-    threatLevelBadge.style.background = "rgba(0, 255, 136, 0.15)";
+    threatLevelBadge.style.borderColor = "var(--threat-low-border)";
+    threatLevelBadge.style.background = "var(--threat-low-bg)";
 
     // Safe Idle State
+    if (lightBar) {
+      lightBar.className = "emergency-light-bar safe";
+      if (lightBarIcon) lightBarIcon.textContent = "🛡️";
+      if (lightBarTitle) lightBarTitle.textContent = "SYSTEM SECURE — CALL MONITORING NORMAL";
+    }
     if (beaconWidget) {
       beaconWidget.className = "beacon-widget safe";
       if (beaconText) beaconText.textContent = "🟢 DEFENSE NORMAL";
     }
-    stopSiren();
   }
 
   // 3. Update Meta
