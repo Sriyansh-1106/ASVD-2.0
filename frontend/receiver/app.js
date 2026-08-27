@@ -235,60 +235,7 @@ function renderHighlightedTranscript(text) {
   transcriptFeed.scrollTop = transcriptFeed.scrollHeight;
 }
 
-// Web Audio API Synthesizer Siren (No External MP3 Needed)
-function playSiren() {
-  if (isAlarmMuted) return;
-  if (alarmAudioContext) return; // Already playing
-
-  try {
-    alarmAudioContext = new (window.AudioContext || window.webkitAudioContext)();
-    alarmOscillator = alarmAudioContext.createOscillator();
-    const gainNode = alarmAudioContext.createGain();
-
-    alarmOscillator.type = "sawtooth";
-    alarmOscillator.frequency.setValueAtTime(440, alarmAudioContext.currentTime);
-    
-    // Siren wobble effect
-    alarmOscillator.frequency.exponentialRampToValueAtTime(880, alarmAudioContext.currentTime + 0.3);
-    alarmOscillator.frequency.exponentialRampToValueAtTime(440, alarmAudioContext.currentTime + 0.6);
-
-    gainNode.gain.setValueAtTime(0.08, alarmAudioContext.currentTime);
-
-    alarmOscillator.connect(gainNode);
-    gainNode.connect(alarmAudioContext.destination);
-
-    alarmOscillator.start();
-  } catch (e) {
-    console.warn("Audio Context error:", e);
-  }
-}
-
-function stopSiren() {
-  if (alarmOscillator) {
-    try {
-      alarmOscillator.stop();
-      alarmOscillator.disconnect();
-    } catch (e) {}
-    alarmOscillator = null;
-  }
-  if (alarmAudioContext) {
-    try {
-      alarmAudioContext.close();
-    } catch (e) {}
-    alarmAudioContext = null;
-  }
-}
-
-window.toggleAudioAlarm = function() {
-  isAlarmMuted = !isAlarmMuted;
-  const btnText = document.getElementById("alarmBtnText");
-  if (isAlarmMuted) {
-    stopSiren();
-    btnText.textContent = "Siren Muted 🔇";
-  } else {
-    btnText.textContent = "Siren Active 🔔";
-  }
-};
+// Visual Emergency Strobe Beacon is driven via CSS keyframe animations and DOM states in updateUI()
 
 // History Drawer Modal Logic
 btnOpenHistory.addEventListener("click", async () => {

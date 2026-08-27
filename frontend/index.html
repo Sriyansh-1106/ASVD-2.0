@@ -3,38 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASVD 2.O — Cyber-Glass AI Scam Voice Defense Platform</title>
+  <title>ASVD 2.O — AI Scam Voice & Threat Defense Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-space: #030712;
-      --bg-surface: rgba(10, 16, 35, 0.75);
-      --bg-card: rgba(13, 22, 48, 0.70);
-      --bg-card-hover: rgba(18, 32, 68, 0.85);
-      --bg-glass-elevated: rgba(15, 25, 55, 0.88);
+      --bg-base: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.92);
+      --bg-card-hover: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-input: #f8fafc;
 
-      --neon-cyan: #00f2fe;
-      --neon-blue: #38bdf8;
-      --neon-purple: #8a2be2;
-      --neon-pink: #ec4899;
-      --neon-red: #ff1155;
-      --neon-amber: #f59e0b;
-      --neon-green: #00ff88;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #94a3b8;
 
-      --text-glow: #ffffff;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-light: #eff6ff;
+      --primary-border: #bfdbfe;
 
-      --border-cyber: rgba(0, 242, 254, 0.28);
-      --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-glow-cyan: 0 0 20px rgba(0, 242, 254, 0.25);
-      --border-glow-red: 0 0 25px rgba(255, 17, 85, 0.35);
+      --accent-safe: #059669;
+      --accent-safe-bg: #ecfdf5;
+      --accent-safe-border: #a7f3d0;
 
-      --radius-2xl: 28px;
-      --radius-xl: 20px;
+      --accent-warn: #d97706;
+      --accent-warn-bg: #fffbeb;
+
+      --accent-danger: #e11d48;
+      --accent-danger-bg: #fff1f2;
+      --accent-danger-border: #fecdd3;
+
+      --border-subtle: #e2e8f0;
+      --border-medium: #cbd5e1;
+
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 20px 40px -8px rgba(15, 23, 42, 0.10), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
+      --shadow-xl: 0 25px 55px -12px rgba(15, 23, 42, 0.14);
+
+      --radius-2xl: 24px;
+      --radius-xl: 18px;
       --radius-lg: 14px;
       --radius-md: 10px;
     }
@@ -43,35 +54,34 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Outfit', 'Inter', -apple-system, sans-serif;
     }
 
     body {
-      background-color: var(--bg-space);
+      background-color: var(--bg-base);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 24px;
+      padding: 44px 20px;
       position: relative;
       overflow-x: hidden;
     }
 
-    /* Ambient Quantum Starfield & Mesh */
+    /* Ambient Light Mesh Background */
     body::before {
       content: '';
       position: fixed;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
+      top: -40%;
+      left: -40%;
+      width: 180%;
+      height: 180%;
       background: 
-        radial-gradient(circle at 18% 18%, rgba(0, 242, 254, 0.14) 0%, transparent 42%),
-        radial-gradient(circle at 82% 82%, rgba(255, 17, 85, 0.13) 0%, transparent 45%),
-        radial-gradient(circle at 50% 50%, rgba(138, 43, 226, 0.10) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 35%);
-      animation: ambient-nebula 24s ease-in-out infinite alternate;
+        radial-gradient(circle at 15% 15%, rgba(37, 99, 235, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(225, 29, 72, 0.06) 0%, transparent 48%),
+        radial-gradient(circle at 50% 30%, rgba(5, 150, 105, 0.05) 0%, transparent 50%);
+      pointer-events: none;
       z-index: -2;
     }
 
@@ -83,124 +93,160 @@
       width: 100%;
       height: 100%;
       background-image: 
-        linear-gradient(rgba(0, 242, 254, 0.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 242, 254, 0.035) 1px, transparent 1px);
-      background-size: 36px 36px;
-      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%);
-      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.3) 70%, transparent 100%);
+        linear-gradient(rgba(226, 232, 240, 0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(226, 232, 240, 0.5) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 75%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.2) 75%, transparent 100%);
       pointer-events: none;
       z-index: -1;
     }
 
-    @keyframes ambient-nebula {
-      0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(180deg) scale(1.08); }
-      100% { transform: rotate(360deg) scale(1); }
-    }
-
-    .wrapper {
+    .container {
       width: 100%;
-      max-width: 1120px;
+      max-width: 1080px;
       display: flex;
       flex-direction: column;
       gap: 36px;
     }
 
-    /* Hero Header */
-    header {
+    /* Top Brand Navigation */
+    .top-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 14px 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .brand-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      letter-spacing: -0.4px;
+    }
+
+    .brand-tagline {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .live-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent-safe-bg);
+      border: 1px solid var(--accent-safe-border);
+      color: var(--accent-safe);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .pulse-green {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-safe);
+      box-shadow: 0 0 8px var(--accent-safe);
+      animation: pulse-dot 1.6s infinite alternate;
+    }
+
+    @keyframes pulse-dot {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Hero Section */
+    .hero-section {
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 16px;
-      position: relative;
+      padding: 10px 0;
     }
 
-    .cyber-badge {
+    .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      background: rgba(0, 242, 254, 0.08);
-      border: 1px solid var(--border-cyber);
-      color: var(--neon-cyan);
+      gap: 8px;
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      color: var(--primary);
       font-size: 12px;
       font-weight: 800;
-      padding: 8px 22px;
-      border-radius: 40px;
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 1.5px;
+      padding: 6px 18px;
+      border-radius: 30px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      box-shadow: 0 0 25px rgba(0, 242, 254, 0.2);
-      backdrop-filter: blur(12px);
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    .radar-pulse {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--neon-cyan);
-      box-shadow: 0 0 10px var(--neon-cyan);
-      animation: radar-blink 1.4s infinite alternate;
-    }
-
-    @keyframes radar-blink {
-      0% { opacity: 0.3; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1.3); }
-    }
-
-    h1.hero-title {
-      font-size: 52px;
+    .hero-title {
+      font-size: 46px;
       font-weight: 900;
       letter-spacing: -1.2px;
       line-height: 1.15;
-      background: linear-gradient(135deg, #ffffff 30%, #a5f3fc 65%, var(--neon-cyan) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 40px rgba(0, 242, 254, 0.25);
+      color: var(--text-main);
+      max-width: 820px;
     }
 
-    p.hero-subtitle {
-      font-size: 17px;
+    .hero-title span {
+      background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 50%, var(--accent-danger) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 16px;
       color: var(--text-muted);
-      max-width: 740px;
-      line-height: 1.65;
+      max-width: 680px;
+      line-height: 1.6;
       font-weight: 400;
     }
 
-    /* Live Telemetry Pipeline Bar */
-    .telemetry-pipeline {
+    /* Interactive Pipeline Bar */
+    .pipeline-container {
       background: var(--bg-surface);
-      backdrop-filter: blur(24px);
-      border: 1px solid var(--border-cyber);
+      border: 1px solid var(--border-subtle);
       border-radius: var(--radius-xl);
-      padding: 20px 30px;
+      padding: 18px 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), var(--border-glow-cyan);
-      position: relative;
-      overflow: hidden;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
     }
 
-    .telemetry-pipeline::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-      animation: scan-line 3s linear infinite;
-    }
-
-    @keyframes scan-line {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    .pipeline-step {
+    .pipeline-node {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -209,77 +255,48 @@
       color: var(--text-main);
     }
 
-    .step-icon {
+    .node-icon {
       width: 32px;
       height: 32px;
       border-radius: 8px;
-      background: rgba(0, 242, 254, 0.12);
-      border: 1px solid rgba(0, 242, 254, 0.3);
+      background: var(--bg-subtle);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 15px;
-      color: var(--neon-cyan);
     }
 
     .pipeline-arrow {
-      color: var(--neon-cyan);
-      font-weight: 900;
-      opacity: 0.7;
-      font-size: 16px;
+      color: var(--text-dim);
+      font-weight: 800;
+      font-size: 15px;
     }
 
-    /* Dual Device Command Center Grid */
+    /* Dual Device Command Cards */
     .device-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 28px;
+      gap: 24px;
     }
 
-    .device-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(28px);
-      -webkit-backdrop-filter: blur(28px);
-      border: 1px solid var(--border-cyber);
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
       border-radius: var(--radius-2xl);
-      padding: 36px;
+      padding: 32px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
-      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6);
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: 22px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
       overflow: hidden;
     }
 
-    .device-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
-    }
-
-    .device-card:hover {
-      transform: translateY(-6px);
-      background: var(--bg-card-hover);
-      box-shadow: 0 24px 70px rgba(0, 242, 254, 0.22);
-      border-color: rgba(0, 242, 254, 0.6);
-    }
-
-    .device-card.receiver-defense::before {
-      background: linear-gradient(90deg, var(--neon-red), #ff5500);
-    }
-
-    .device-card.receiver-defense {
-      border-color: rgba(255, 17, 85, 0.35);
-    }
-
-    .device-card.receiver-defense:hover {
-      box-shadow: 0 24px 70px rgba(255, 17, 85, 0.25);
-      border-color: rgba(255, 17, 85, 0.7);
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+      border-color: var(--primary-border);
     }
 
     .card-top {
@@ -288,122 +305,112 @@
       align-items: flex-start;
     }
 
-    .card-icon-halo {
-      width: 64px;
-      height: 64px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(56, 189, 248, 0.05));
-      border: 1px solid var(--border-cyber);
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
-      box-shadow: 0 0 25px rgba(0, 242, 254, 0.3);
+      font-size: 28px;
     }
 
-    .receiver-defense .card-icon-halo {
-      background: linear-gradient(135deg, rgba(255, 17, 85, 0.2), rgba(255, 85, 0, 0.05));
-      border-color: rgba(255, 17, 85, 0.4);
-      box-shadow: 0 0 25px rgba(255, 17, 85, 0.35);
+    .card.receiver-defense .card-icon {
+      background: var(--accent-danger-bg);
+      border-color: var(--accent-danger-border);
     }
 
     .card-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 800;
-      padding: 4px 12px;
+      padding: 5px 12px;
       border-radius: 20px;
-      background: rgba(0, 242, 254, 0.1);
-      color: var(--neon-cyan);
-      border: 1px solid var(--border-cyber);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
     }
 
-    .receiver-defense .card-badge {
-      background: rgba(255, 17, 85, 0.1);
-      color: var(--neon-red);
-      border-color: rgba(255, 17, 85, 0.4);
-    }
-
-    .card-info h2 {
-      font-size: 26px;
+    .card h2 {
+      font-size: 24px;
       font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 8px;
+      letter-spacing: -0.4px;
+      color: var(--text-main);
+      margin-bottom: 6px;
     }
 
-    .card-info p {
+    .card p {
       font-size: 14px;
       color: var(--text-muted);
       line-height: 1.55;
     }
 
-    .specs-grid {
+    .feature-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       font-size: 13px;
-      color: #cbd5e1;
-      background: rgba(6, 11, 26, 0.6);
+      font-weight: 500;
+      color: var(--text-main);
+      background: var(--bg-subtle);
       padding: 16px;
       border-radius: var(--radius-lg);
-      border: 1px solid var(--border-subtle);
     }
 
-    .specs-grid li {
+    .feature-list li {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .bullet-glow {
+    .feature-bullet {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--neon-cyan);
-      box-shadow: 0 0 8px var(--neon-cyan);
+      background: var(--primary);
     }
 
-    .receiver-defense .bullet-glow {
-      background: var(--neon-red);
-      box-shadow: 0 0 8px var(--neon-red);
+    .card.receiver-defense .feature-bullet {
+      background: var(--accent-danger);
     }
 
-    .btn-launch-cyber {
+    .btn-launch {
       margin-top: auto;
       text-decoration: none;
-      background: linear-gradient(135deg, var(--neon-cyan) 0%, #0072ff 100%);
-      color: #040915;
-      font-weight: 800;
-      font-size: 15px;
-      padding: 16px 28px;
-      border-radius: var(--radius-lg);
+      background: var(--primary);
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 14px 24px;
+      border-radius: var(--radius-md);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      box-shadow: 0 6px 30px rgba(0, 242, 254, 0.4);
-      transition: all 0.25s ease;
-      letter-spacing: 0.5px;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+      transition: all 0.2s ease;
     }
 
-    .btn-launch-cyber:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 40px rgba(0, 242, 254, 0.65);
-      filter: brightness(1.1);
+    .btn-launch:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
     }
 
-    .btn-launch-cyber.defense {
-      background: linear-gradient(135deg, var(--neon-red) 0%, #ff5500 100%);
-      color: #ffffff;
-      box-shadow: 0 6px 30px rgba(255, 17, 85, 0.45);
+    .btn-launch.defense {
+      background: var(--accent-danger);
+      box-shadow: 0 4px 14px rgba(225, 29, 72, 0.25);
     }
 
-    .btn-launch-cyber.defense:hover {
-      box-shadow: 0 10px 40px rgba(255, 17, 85, 0.7);
+    .btn-launch.defense:hover {
+      background: #be123c;
+      box-shadow: 0 6px 20px rgba(225, 29, 72, 0.35);
     }
 
-    /* Live Telemetry Footer */
+    /* Footer */
     footer {
       display: flex;
       justify-content: space-between;
@@ -411,118 +418,112 @@
       font-size: 12px;
       color: var(--text-dim);
       font-family: 'JetBrains Mono', monospace;
-      padding-top: 10px;
+      padding-top: 14px;
       border-top: 1px solid var(--border-subtle);
       flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .status-online {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--neon-green);
-    }
-
-    .online-indicator {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--neon-green);
-      box-shadow: 0 0 10px var(--neon-green);
+      gap: 10px;
     }
   </style>
 </head>
 <body>
 
-  <div class="wrapper">
-    <!-- Hero Section -->
-    <header>
-      <div class="cyber-badge">
-        <span class="radar-pulse"></span>
-        <span>ASVD 2.O • QUANTUM CYBER VOICE DEFENSE</span>
+  <div class="container">
+    <!-- Top Navbar -->
+    <nav class="top-nav">
+      <div class="brand-logo">
+        <div class="logo-icon">🛡️</div>
+        <div>
+          <div class="brand-name">ASVD 2.O</div>
+          <div class="brand-tagline">AI Scam Voice Detection Engine</div>
+        </div>
       </div>
-      <h1 class="hero-title">AI Scam Voice Detection Engine</h1>
-      <p class="hero-subtitle">
-        Real-time multi-device cyber intelligence platform identifying coercive extortion, OTP theft, authority impersonation, and psychological fraud in English, Hindi & Hinglish.
+      <div class="live-status-pill">
+        <span class="pulse-green"></span>
+        <span>ENGINE OPERATIONAL</span>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+      <div class="hero-badge">⚡ Real-Time Cyber Voice Intelligence</div>
+      <h1 class="hero-title">Defend Voice Calls with <span>Next-Gen AI Threat Detection</span></h1>
+      <p class="hero-desc">
+        Dual-device live acoustic analysis intercepting coercive extortion, OTP theft, and social engineering in Hindi, English & Hinglish.
       </p>
     </header>
 
-    <!-- Telemetry Step Pipeline -->
-    <div class="telemetry-pipeline">
-      <div class="pipeline-step">
-        <div class="step-icon">🎙️</div>
-        <div>1. Live Audio Streaming</div>
+    <!-- Pipeline Steps -->
+    <div class="pipeline-container">
+      <div class="pipeline-node">
+        <div class="node-icon">🎙️</div>
+        <div>1. Live Voice Stream</div>
       </div>
       <div class="pipeline-arrow">➔</div>
-      <div class="pipeline-step">
-        <div class="step-icon">⚡</div>
-        <div>2. Sub-100ms Speech Decoding</div>
+      <div class="pipeline-node">
+        <div class="node-icon">⚡</div>
+        <div>2. Real-Time Decoder</div>
       </div>
       <div class="pipeline-arrow">➔</div>
-      <div class="pipeline-step">
-        <div class="step-icon">🧠</div>
-        <div>3. 8-Vector NLP & ML Engine</div>
+      <div class="pipeline-node">
+        <div class="node-icon">🧠</div>
+        <div>3. 8-Vector NLP & ML</div>
       </div>
       <div class="pipeline-arrow">➔</div>
-      <div class="pipeline-step">
-        <div class="step-icon">🚨</div>
-        <div>4. Holographic Radar Alert</div>
+      <div class="pipeline-node">
+        <div class="node-icon">🚨</div>
+        <div>4. Visual Strobe Alert</div>
       </div>
     </div>
 
     <!-- Dual Command Center Grid -->
     <div class="device-grid">
-      <!-- Device 1: Caller Attack Simulator -->
-      <div class="device-card">
+      <!-- Device 1: Caller Simulator -->
+      <div class="card">
         <div class="card-top">
-          <div class="card-icon-halo">📞</div>
+          <div class="card-icon">📞</div>
           <span class="card-badge">DEVICE 1 • SOURCE</span>
         </div>
-        <div class="card-info">
+        <div>
           <h2>Caller Simulator</h2>
-          <p>Simulates the incoming phone call stream. Speak live using your physical microphone or inject real-world scam scenario vectors with 1-click.</p>
+          <p>Transmits live spoken voice from your physical microphone or injects realistic scam attack vectors with 1-click presets.</p>
         </div>
-        <ul class="specs-grid">
-          <li><span class="bullet-glow"></span> <span>Live Audio Visualizer & FFT Voice Oscilloscope</span></li>
-          <li><span class="bullet-glow"></span> <span>Multi-turn English & Hinglish Speech Ingestion</span></li>
-          <li><span class="bullet-glow"></span> <span>Real-time Local AI Threat Score Preview HUD</span></li>
-          <li><span class="bullet-glow"></span> <span>1-Click Scenarios (Kidnap, CBI, Bank, OTP, Loan)</span></li>
+        <ul class="feature-list">
+          <li><span class="feature-bullet"></span> <span>Zero-latency Hindi, English & Hinglish transcription</span></li>
+          <li><span class="feature-bullet"></span> <span>Real-time voice level VU meter & sine wave oscilloscope</span></li>
+          <li><span class="feature-bullet"></span> <span>Instant local risk assessment preview</span></li>
+          <li><span class="feature-bullet"></span> <span>1-Click Scenarios (Kidnap, Bank, CBI, Police, OTP)</span></li>
         </ul>
-        <a href="/caller" class="btn-launch-cyber" target="_blank">
+        <a href="/caller" class="btn-launch" target="_blank">
           Launch Caller Simulator ➔
         </a>
       </div>
 
       <!-- Device 2: Receiver Defense HUD -->
-      <div class="device-card receiver-defense">
+      <div class="card receiver-defense">
         <div class="card-top">
-          <div class="card-icon-halo">🛡️</div>
+          <div class="card-icon">🛡️</div>
           <span class="card-badge">DEVICE 2 • SHIELD</span>
         </div>
-        <div class="card-info">
+        <div>
           <h2>Receiver Threat HUD</h2>
-          <p>The victim's real-time AI security shield. Intercepts speech streams, assesses psychological coercion triggers, and sounds an instant siren.</p>
+          <p>The victim's real-time AI security defense screen. Intercepts speech, calculates danger levels, and triggers continuous visual flashing lights.</p>
         </div>
-        <ul class="specs-grid">
-          <li><span class="bullet-glow"></span> <span>0–100 Circular Holographic Risk Gauge</span></li>
-          <li><span class="bullet-glow"></span> <span>8 Active Cyber Indicator Markers (OTP, Kidnap, Arrest)</span></li>
-          <li><span class="bullet-glow"></span> <span>Web Audio Synthesized Emergency Warning Siren</span></li>
-          <li><span class="bullet-glow"></span> <span>Live Keyword Highlighter & 1930 Cyber Helpline</span></li>
+        <ul class="feature-list">
+          <li><span class="feature-bullet"></span> <span>0–100 High-Precision Circular Risk Gauge</span></li>
+          <li><span class="feature-bullet"></span> <span>Flashing Yellow & Red Corner Emergency Strobe Lights</span></li>
+          <li><span class="feature-bullet"></span> <span>8 Active Cyber Threat Indicators (OTP, Arrest, Kidnap)</span></li>
+          <li><span class="feature-bullet"></span> <span>Live Trigger Keyword Highlighter & 1930 Cyber Helpline</span></li>
         </ul>
-        <a href="/receiver" class="btn-launch-cyber defense" target="_blank">
+        <a href="/receiver" class="btn-launch defense" target="_blank">
           Launch Receiver HUD ➔
         </a>
       </div>
     </div>
 
-    <!-- Telemetry Footer -->
+    <!-- Footer -->
     <footer>
-      <div class="status-online">
-        <span class="online-indicator"></span>
-        <span>CORE ENGINE OPERATIONAL (PORT 8000)</span>
-      </div>
       <div>ASVD 2.O • DEVELOPED BY SRIYANSH SHEEL</div>
+      <div>CORE ENGINE: FASTAPI • SCIKIT-LEARN • WEBSOCKET STREAMING</div>
     </footer>
   </div>
 
