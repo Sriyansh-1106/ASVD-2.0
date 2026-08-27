@@ -436,12 +436,16 @@ function startMediaRecorderAudioSlices(stream) {
 }
 
 async function sendAudioChunkToBackend(blob) {
+  // If browser has native SpeechRecognition, let it handle real-time streaming to avoid collisions
+  const hasNativeSpeech = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (hasNativeSpeech) return;
+
   if (!isMicActive || blob.size < 1000) return;
 
   try {
     const formData = new FormData();
     formData.append("audio", blob, "chunk.wav");
-    formData.append("language", languageSelect.value || "en-IN");
+    formData.append("language", languageSelect.value || "hi-IN");
     formData.append("session_id", sessionIdInput.value.trim());
     formData.append("caller_id", callerNameInput.value.trim());
 
