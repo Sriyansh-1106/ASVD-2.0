@@ -120,11 +120,14 @@ function updateThreatHUD(data, transcriptText) {
   const offset = CIRCUMFERENCE - (score / 100) * CIRCUMFERENCE;
   gaugeProgress.style.strokeDashoffset = offset;
 
-  // 2. Set Colors & Theme
+  // Reset Classes
   threatPanel.className = "threat-panel";
   actionBanner.className = "action-banner";
   systemPulse.className = "pulse-dot";
   threatLevelBadge.className = "threat-level-badge";
+
+  const beaconWidget = document.getElementById("cornerBeacon");
+  const beaconText = document.getElementById("beaconText");
 
   if (level === "CRITICAL") {
     gaugeProgress.style.stroke = "var(--threat-critical)";
@@ -133,20 +136,36 @@ function updateThreatHUD(data, transcriptText) {
     systemPulse.classList.add("danger");
     threatLevelBadge.classList.add("critical");
     threatLevelBadge.textContent = "🚨 CRITICAL THREAT";
-    playSiren();
+    
+    // Activate Continuous Rapid Red & Yellow Strobe
+    if (beaconWidget) {
+      beaconWidget.className = "beacon-widget critical";
+      if (beaconText) beaconText.textContent = "🚨 CRITICAL STROBE";
+    }
   } else if (level === "HIGH") {
     gaugeProgress.style.stroke = "var(--threat-high)";
     threatPanel.classList.add("high");
     actionBanner.classList.add("critical");
     systemPulse.classList.add("danger");
     threatLevelBadge.textContent = "⚠️ HIGH THREAT";
-    playSiren();
+
+    // Activate Continuous Red & Yellow Strobe
+    if (beaconWidget) {
+      beaconWidget.className = "beacon-widget critical";
+      if (beaconText) beaconText.textContent = "⚠️ THREAT STROBE";
+    }
   } else if (level === "MEDIUM") {
     gaugeProgress.style.stroke = "var(--threat-med)";
     threatLevelBadge.textContent = "⚡ MEDIUM RISK";
     threatLevelBadge.style.color = "var(--threat-med)";
     threatLevelBadge.style.borderColor = "var(--threat-med)";
     threatLevelBadge.style.background = "rgba(255, 204, 0, 0.15)";
+
+    // Activate Continuous Yellow / Amber Warning Light
+    if (beaconWidget) {
+      beaconWidget.className = "beacon-widget warning";
+      if (beaconText) beaconText.textContent = "🟡 WARNING BEACON";
+    }
     stopSiren();
   } else {
     gaugeProgress.style.stroke = "var(--threat-low)";
@@ -155,6 +174,12 @@ function updateThreatHUD(data, transcriptText) {
     threatLevelBadge.style.color = "var(--threat-low)";
     threatLevelBadge.style.borderColor = "var(--threat-low)";
     threatLevelBadge.style.background = "rgba(0, 255, 136, 0.15)";
+
+    // Safe Idle State
+    if (beaconWidget) {
+      beaconWidget.className = "beacon-widget safe";
+      if (beaconText) beaconText.textContent = "🟢 DEFENSE NORMAL";
+    }
     stopSiren();
   }
 

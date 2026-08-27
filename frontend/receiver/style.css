@@ -147,6 +147,102 @@ body::after {
   flex-wrap: wrap;
 }
 
+/* Continuous Yellow / Red Corner Emergency Strobe Beacon */
+.beacon-widget {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-card-elevated);
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: 1px solid var(--border-subtle);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  transition: all 0.3s ease;
+}
+
+.beacon-light {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.beacon-light.yellow-light {
+  background: rgba(255, 204, 0, 0.25);
+  border: 1px solid rgba(255, 204, 0, 0.4);
+}
+
+.beacon-light.red-light {
+  background: rgba(255, 17, 85, 0.25);
+  border: 1px solid rgba(255, 17, 85, 0.4);
+}
+
+/* Beacon State: SAFE (Passive) */
+.beacon-widget.safe {
+  border-color: rgba(0, 255, 136, 0.2);
+  color: var(--threat-low);
+}
+
+.beacon-widget.safe .yellow-light,
+.beacon-widget.safe .red-light {
+  opacity: 0.3;
+}
+
+/* Beacon State: WARNING (Continuous Yellow / Amber Strobe) */
+.beacon-widget.warning {
+  border-color: var(--threat-med);
+  background: rgba(255, 204, 0, 0.12);
+  color: var(--threat-med);
+  box-shadow: 0 0 25px rgba(255, 204, 0, 0.35);
+}
+
+.beacon-widget.warning .yellow-light {
+  background: #ffcc00;
+  border-color: #ffffff;
+  box-shadow: 0 0 16px #ffcc00, 0 0 30px rgba(255, 204, 0, 0.8);
+  animation: strobe-yellow-blink 0.4s infinite alternate ease-in-out;
+}
+
+.beacon-widget.warning .red-light {
+  opacity: 0.35;
+}
+
+/* Beacon State: CRITICAL (Continuous Rapid Alternating Red & Yellow Strobe) */
+.beacon-widget.critical {
+  border-color: var(--threat-critical);
+  background: rgba(255, 17, 85, 0.18);
+  color: #ffffff;
+  box-shadow: 0 0 35px rgba(255, 17, 85, 0.5), 0 0 60px rgba(255, 204, 0, 0.3);
+}
+
+.beacon-widget.critical .red-light {
+  background: #ff1155;
+  border-color: #ffffff;
+  box-shadow: 0 0 18px #ff1155, 0 0 35px rgba(255, 17, 85, 0.9);
+  animation: strobe-red-blink 0.25s infinite alternate ease-in-out;
+}
+
+.beacon-widget.critical .yellow-light {
+  background: #ffcc00;
+  border-color: #ffffff;
+  box-shadow: 0 0 18px #ffcc00, 0 0 35px rgba(255, 204, 0, 0.9);
+  animation: strobe-yellow-blink 0.25s infinite alternate ease-in-out 0.12s;
+}
+
+@keyframes strobe-yellow-blink {
+  0% { transform: scale(0.85); opacity: 0.4; filter: brightness(0.7); }
+  100% { transform: scale(1.25); opacity: 1; filter: brightness(1.4); }
+}
+
+@keyframes strobe-red-blink {
+  0% { transform: scale(0.85); opacity: 0.4; filter: brightness(0.7); }
+  100% { transform: scale(1.25); opacity: 1; filter: brightness(1.4); }
+}
+
 .session-chip {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
