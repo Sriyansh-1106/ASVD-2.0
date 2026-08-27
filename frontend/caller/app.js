@@ -701,10 +701,10 @@ function renderWaveform() {
     }
 
     ctx.beginPath();
-    ctx.lineWidth = isMicActive ? 3.0 : 2;
+    ctx.lineWidth = isMicActive ? 3.5 : 2;
     ctx.strokeStyle = isCalling
-      ? (isMicActive ? "#2563eb" : "#3b82f6")
-      : "#cbd5e1";
+      ? (isMicActive ? "#4f46e5" : "#06b6d4")
+      : "#94a3b8";
 
     for (let x = 0; x < canvas.width; x++) {
       const y = midY + Math.sin((x + step) * 0.04) * amplitude * Math.sin(x * 0.015);
