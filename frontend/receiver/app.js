@@ -123,6 +123,7 @@ function updateThreatHUD(data, transcriptText) {
   systemPulse.className = "pulse-dot";
   threatLevelBadge.className = "threat-level-badge";
 
+  const screenStrobe = document.getElementById("screenStrobeBorder");
   const lightBar = document.getElementById("emergencyLightBar");
   const lightBarIcon = document.getElementById("lightBarIcon");
   const lightBarTitle = document.getElementById("lightBarTitle");
@@ -137,7 +138,9 @@ function updateThreatHUD(data, transcriptText) {
     threatLevelBadge.classList.add("critical");
     threatLevelBadge.textContent = "🚨 CRITICAL THREAT";
     
-    // Activate Continuous High-Power Red & Yellow Flashing Emergency Strobe
+    // Complete Flashing Viewport Perimeter Border & Giant Strobe
+    if (screenStrobe) screenStrobe.className = "screen-strobe-border critical";
+
     if (lightBar) {
       lightBar.className = "emergency-light-bar critical";
       if (lightBarIcon) lightBarIcon.textContent = "🚨";
@@ -154,7 +157,9 @@ function updateThreatHUD(data, transcriptText) {
     systemPulse.classList.add("danger");
     threatLevelBadge.textContent = "⚠️ HIGH THREAT";
 
-    // Activate Flashing Red & Yellow Strobe
+    // Complete Flashing Viewport Perimeter Border & Giant Strobe
+    if (screenStrobe) screenStrobe.className = "screen-strobe-border critical";
+
     if (lightBar) {
       lightBar.className = "emergency-light-bar critical";
       if (lightBarIcon) lightBarIcon.textContent = "⚠️";
@@ -171,7 +176,9 @@ function updateThreatHUD(data, transcriptText) {
     threatLevelBadge.style.borderColor = "var(--threat-med-border)";
     threatLevelBadge.style.background = "var(--threat-med-bg)";
 
-    // Activate Continuous Flashing Yellow Warning Strobe
+    // Complete Flashing Amber / Yellow Screen Border
+    if (screenStrobe) screenStrobe.className = "screen-strobe-border warning";
+
     if (lightBar) {
       lightBar.className = "emergency-light-bar warning";
       if (lightBarIcon) lightBarIcon.textContent = "🟡";
@@ -190,6 +197,8 @@ function updateThreatHUD(data, transcriptText) {
     threatLevelBadge.style.background = "var(--threat-low-bg)";
 
     // Safe Idle State
+    if (screenStrobe) screenStrobe.className = "screen-strobe-border safe";
+
     if (lightBar) {
       lightBar.className = "emergency-light-bar safe";
       if (lightBarIcon) lightBarIcon.textContent = "🛡️";

@@ -505,7 +505,7 @@ function setupSpeechRecognition() {
   rec.continuous = true;
   rec.interimResults = true;
   rec.maxAlternatives = 3;
-  rec.lang = languageSelect.value || "en-IN";
+  rec.lang = languageSelect ? languageSelect.value : "hi-IN";
 
   rec.onstart = () => {
     isMicActive = true;
@@ -609,7 +609,7 @@ async function startMicrophone() {
 
   if (recognition) {
     try {
-      recognition.lang = languageSelect.value || "en-IN";
+      recognition.lang = languageSelect ? languageSelect.value : "hi-IN";
       recognition.start();
     } catch (e) {
       console.warn("Mic recognition start notice:", e);

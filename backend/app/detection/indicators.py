@@ -76,6 +76,8 @@ PHONETIC_REPLACEMENTS = [
     (r"रुपये|रुपए|रुपया|पैसे|लाख|करोड़|हजार", "rs lakh"),
     (r"तुरंत|जल्दी|अर्जेंट|अभी के अभी", "urgent turant"),
     (r"पुलिस|सीबीआई|इंस्पेक्टर|कस्टम|थाना", "police cbi inspector"),
+    (r"इनकम टैक्स|टैक्स डिपार्टमेंट|क्राइम ब्रांच|आरबीआई", "income tax department cyber crime rbi"),
+    (r"अस्पताल|हॉस्पिटल|तबीयत|एडमिट|एक्सीडेंट|डॉक्टर|ऑपरेशन|सर्जरी|इलाज", "hospital admit tabiyat accident doctor"),
     (r"अकाउंट|खाता|ब्लॉक|फ्रीज|सील", "account block freeze"),
     (r"ट्रांसफर|भेज दो|जमा|पेमेंट", "transfer"),
     (r"गिरफ्तार|जेल|वारंट|केस|एफआईआर", "arrest jail warrant fir"),
