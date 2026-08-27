@@ -66,7 +66,7 @@ if __name__ == "__main__":
     free_port(8000)
 
     print("=" * 60)
-    print("  🚀 Starting ASVD 2.O — AI Scam Voice Detection System")
+    print("  🚀 Starting ASVD 2.0 - AI Scam Voice Detection System")
     print("=" * 60)
     print()
     print("  🌐 Main Portal:    http://localhost:8000")

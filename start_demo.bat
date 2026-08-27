@@ -1,10 +1,11 @@
 @echo off
-title ASVD 2.O — AI Scam Voice Detection System
+chcp 65001 >nul
+title ASVD 2.0 - AI Scam Voice Detection System
 cd /d "%~dp0"
 setlocal enabledelayedexpansion
 
 echo ======================================================================
-echo   Launching ASVD 2.O — AI Cyber Scam Voice Detection System
+echo   Launching ASVD 2.0 - AI Cyber Scam Voice Detection System
 echo ======================================================================
 echo.
 
