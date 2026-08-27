@@ -482,9 +482,12 @@ function setupAudioVisualizer(stream) {
       dataArray = new Uint8Array(analyser.frequencyBinCount);
     }
   } catch (e) {
-    console.warn("AudioContext visualizer setup error:", e);
+    console.warn("Audio visualizer setup note:", e);
   }
 }
+
+let persistentHistory = "";
+let restartTimeoutId = null;
 
 function setupSpeechRecognition() {
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -497,7 +500,8 @@ function setupSpeechRecognition() {
   const rec = new SpeechRec();
   rec.continuous = true;
   rec.interimResults = true;
-  rec.lang = languageSelect.value || "en-IN";
+  rec.maxAlternatives = 3;
+  rec.lang = languageSelect.value || "hi-IN";
 
   rec.onstart = () => {
     isMicActive = true;
@@ -510,58 +514,64 @@ function setupSpeechRecognition() {
   };
 
   rec.onresult = (event) => {
+    let sessionFinal = "";
     let interim = "";
-    let finalChunk = "";
 
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      const transcript = event.results[i][0].transcript;
-      if (event.results[i].isFinal) {
-        finalChunk += transcript + " ";
+    for (let i = 0; i < event.results.length; ++i) {
+      const res = event.results[i];
+      if (res.isFinal) {
+        sessionFinal += res[0].transcript + " ";
       } else {
-        interim += transcript;
+        interim += res[0].transcript;
       }
     }
 
-    if (finalChunk.trim()) {
-      if (accumulatedTranscript) {
-        accumulatedTranscript += " " + finalChunk.trim();
-      } else {
-        accumulatedTranscript = finalChunk.trim();
-      }
-    }
+    // Combine persistent past history with current session results
+    const confirmedTotal = (persistentHistory ? persistentHistory + " " : "") + sessionFinal.trim();
+    accumulatedTranscript = confirmedTotal.trim();
 
-    const currentDisplay = accumulatedTranscript + (interim ? (accumulatedTranscript ? " " : "") + interim : "");
-    customSpeech.value = currentDisplay;
+    const fullLiveText = accumulatedTranscript + (interim ? (accumulatedTranscript ? " " : "") + interim : "");
+    customSpeech.value = fullLiveText;
     updateLiveSpeechDisplay(accumulatedTranscript, interim);
 
-    if (currentDisplay.trim()) {
+    if (fullLiveText.trim()) {
       speechBoxStatus.textContent = "🟢 Live Speech Transcribed";
-      transmitSpeech(currentDisplay.trim(), Boolean(finalChunk.trim() && !interim));
+      transmitSpeech(fullLiveText.trim(), Boolean(sessionFinal.trim() && !interim));
     }
   };
 
   rec.onerror = (e) => {
-    console.warn("Speech recognition error event:", e.error);
+    console.warn("Speech recognition notice:", e.error);
     if (e.error === "not-allowed" || e.error === "permission-denied") {
       micStatusBanner.innerHTML = "❌ <b>Microphone Access Denied!</b> Please allow microphone permission in your browser address bar.";
       micStatusBanner.className = "mic-status-banner error";
       speechBoxStatus.textContent = "Microphone Denied";
       stopMicrophone();
     } else if (e.error === "no-speech") {
-      speechBoxStatus.textContent = "🎙️ Waiting for voice...";
+      speechBoxStatus.textContent = "🎙️ Listening... (Speak clearly into mic)";
     } else if (e.error === "network") {
-      micStatusBanner.innerHTML = "⚠️ <i>Network error reaching speech recognition service. You can use 'Auto Voice Stream' preset or type text.</i>";
+      micStatusBanner.innerHTML = "⚠️ <i>Network error reaching cloud speech. Preserving local microphone audio stream...</i>";
     }
   };
 
   rec.onend = () => {
-    // If user hasn't explicitly stopped it, auto-restart to ensure continuous speech capture
+    // When recognition cycle finishes or pauses, save confirmed text into persistent history
+    if (accumulatedTranscript) {
+      persistentHistory = accumulatedTranscript;
+    }
+
+    // Safe continuous watchdog restart
     if (isMicActive) {
-      try {
-        rec.start();
-      } catch (err) {
-        console.log("Speech recognition restarted:", err);
-      }
+      clearTimeout(restartTimeoutId);
+      restartTimeoutId = setTimeout(() => {
+        if (isMicActive) {
+          try {
+            rec.start();
+          } catch (err) {
+            console.log("Watchdog restarted speech recognizer");
+          }
+        }
+      }, 120);
     }
   };
 
@@ -571,6 +581,11 @@ function setupSpeechRecognition() {
 languageSelect.addEventListener("change", () => {
   if (recognition) {
     recognition.lang = languageSelect.value;
+    if (isMicActive) {
+      try {
+        recognition.stop();
+      } catch (e) {}
+    }
   }
 });
 
@@ -579,28 +594,22 @@ async function startMicrophone() {
     btnStartCall.click();
   }
 
-  speechBoxStatus.textContent = "Requesting microphone permission...";
-  micStatusBanner.innerHTML = "⏳ <i>Requesting microphone access... Please allow when prompted.</i>";
-
+  isMicActive = true;
+  persistentHistory = accumulatedTranscript || "";
   const hasAudio = await requestMicPermissionAndAudio();
-  if (!hasAudio) {
-    return;
-  }
+  if (!hasAudio) return;
 
   if (!recognition) {
     recognition = setupSpeechRecognition();
   }
 
   if (recognition) {
-    recognition.lang = languageSelect.value;
     try {
+      recognition.lang = languageSelect.value || "hi-IN";
       recognition.start();
     } catch (e) {
-      console.warn("Recognition start call note:", e);
+      console.warn("Mic recognition start notice:", e);
     }
-  } else {
-    // Fallback: If Web Speech not available, prompt stream simulation
-    btnSimulateStream.click();
   }
 }
 

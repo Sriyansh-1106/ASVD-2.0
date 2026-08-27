@@ -68,6 +68,21 @@ PHONETIC_REPLACEMENTS = [
     (r"\b(krore|crore|crores)\b", "crore"),
     (r"\b(hazar|hazaar|thousand)\b", "hazar"),
     
+    # --- Devanagari Hindi to English/Hinglish Transliteration ---
+    (r"किडनैप|अपहरण|अगवा|उठवा", "kidnap"),
+    (r"मारूंगा|मार दूंगा|मार डालूंगा|जान से|खत्म कर", "marunga jaan se"),
+    (r"ओटीपी", "otp"),
+    (r"पासवर्ड|पिन|सीवीवी", "password pin cvv"),
+    (r"रुपये|रुपए|रुपया|पैसे|लाख|करोड़|हजार", "rs lakh"),
+    (r"तुरंत|जल्दी|अर्जेंट|अभी के अभी", "urgent turant"),
+    (r"पुलिस|सीबीआई|इंस्पेक्टर|कस्टम|थाना", "police cbi inspector"),
+    (r"अकाउंट|खाता|ब्लॉक|फ्रीज|सील", "account block freeze"),
+    (r"ट्रांसफर|भेज दो|जमा|पेमेंट", "transfer"),
+    (r"गिरफ्तार|जेल|वारंट|केस|एफआईआर", "arrest jail warrant fir"),
+    (r"किसी को मत बताना|सीक्रेट|गुप्त", "kisi ko mat batana"),
+    (r"फिरौती|रैनसम", "firauti"),
+    (r"बेटे|बेटी|बच्चे|परिवार", "bete family member"),
+
     # --- Credentials, Passwords & OTP Accents ---
     (r"\b(otipi|o\s*t\s*p|odipi|ooteepee)\b", "otp"),
     (r"\b(passward|pasward|pasword|passwrd)\b", "password"),
