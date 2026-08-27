@@ -721,8 +721,36 @@ sessionIdInput.addEventListener("change", () => {
   connectWebSocket();
 });
 
+// ====================================================================
+// UNIVERSAL THEME MANAGER (LIGHT / DARK)
+// ====================================================================
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("asvd_theme", theme);
+  const icon = document.getElementById("themeIcon");
+  const text = document.getElementById("themeText");
+  if (icon && text) {
+    if (theme === "light") {
+      icon.textContent = "☀️";
+      text.textContent = "Light";
+    } else {
+      icon.textContent = "🌙";
+      text.textContent = "Dark";
+    }
+  }
+}
+
+window.toggleTheme = function() {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  const next = current === "light" ? "dark" : "light";
+  applyTheme(next);
+};
+
 // Initialize on Load
 window.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("asvd_theme") || "light";
+  applyTheme(savedTheme);
   connectWebSocket();
   renderWaveform();
   recognition = setupSpeechRecognition();
