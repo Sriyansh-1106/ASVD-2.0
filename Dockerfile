@@ -19,8 +19,9 @@ COPY . .
 # Generate dataset and train AI model if not present
 RUN python data/generate_dataset.py && python ml/train.py
 
-# Expose port
-EXPOSE 8000
+# Set environment
+ENV PYTHONPATH=/app
+ENV PORT=8000
 
-# Start production server
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start production server using dynamic PORT assigned by cloud host (Render/AWS/Heroku)
+CMD ["sh", "-c", "uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
