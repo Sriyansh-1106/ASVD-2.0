@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  asvd-ai-backend:
+    build: .
+    container_name: asvd-remote-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=8000

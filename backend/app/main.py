@@ -65,13 +65,25 @@ if os.path.exists(FRONTEND_DIR):
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 
+@app.get("/caller", response_class=FileResponse)
+def caller_page():
+    """Caller simulator view."""
+    return FileResponse(os.path.join(CALLER_DIR, "index.html"))
+
+
+@app.get("/receiver", response_class=FileResponse)
+def receiver_page():
+    """Receiver defense HUD view."""
+    return FileResponse(os.path.join(RECEIVER_DIR, "index.html"))
+
+
 @app.get("/", response_class=FileResponse)
 def root_portal():
     """Main portal landing page."""
     portal_html = os.path.join(FRONTEND_DIR, "index.html")
     if os.path.exists(portal_html):
         return FileResponse(portal_html)
-    return FileResponse(os.path.join(FRONTEND_DIR, "receiver", "index.html"))
+    return FileResponse(os.path.join(RECEIVER_DIR, "index.html"))
 
 
 

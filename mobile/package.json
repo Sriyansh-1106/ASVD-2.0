@@ -1,0 +1,17 @@
+{
+  "name": "asvd-caller-mobile",
+  "version": "2.0.0",
+  "description": "ASVD 2.0 - Standalone Android Caller Device APK",
+  "scripts": {
+    "sync": "cap sync android",
+    "open": "cap open android",
+    "build": "cap sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}

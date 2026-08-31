@@ -9,7 +9,7 @@ Handles:
 
 import io
 import wave
-from typing import Optional, List
+from typing import Optional, List, Any
 import numpy as np
 from scipy import signal
 import speech_recognition as sr
@@ -96,6 +96,45 @@ def get_whisper_model():
     return _whisper_model
 
 
+def get_audio_rms(audio_bytes: bytes) -> float:
+    """Calculate RMS energy of 16-bit PCM WAV audio."""
+    if not audio_bytes or len(audio_bytes) < 44:
+        return 0.0
+    try:
+        with wave.open(io.BytesIO(audio_bytes), "rb") as wav_in:
+            n_frames = wav_in.getnframes()
+            raw_frames = wav_in.readframes(n_frames)
+            if not raw_frames:
+                return 0.0
+            audio_array = np.frombuffer(raw_frames, dtype=np.int16).astype(np.float32)
+            rms = np.sqrt(np.mean(audio_array ** 2))
+            return float(rms)
+    except Exception:
+        return 0.0
+
+
+# Known hallucination phrases produced by Whisper on silence/ambient noise
+HALLUCINATION_PATTERNS = {
+    "thank you", "thank you.", "thank you very much", "thanks for watching",
+    "subtitles by", "subtitles", "you", "...", ".", "bye", "bye.", "subscribe",
+    "धन्यवाद", "नमस्ते", "शुक्रिया", "लाइक करें", "सब्सक्राइब करें"
+}
+
+
+def is_hallucination_or_noise(text: str) -> bool:
+    """Check if transcribed text is a common Whisper silence artifact or gibberish."""
+    cleaned = text.strip().lower()
+    if not cleaned or len(cleaned) <= 1:
+        return True
+    if cleaned in HALLUCINATION_PATTERNS:
+        return True
+    # Repetitive single word artifacts e.g. "you you you"
+    words = cleaned.split()
+    if len(words) >= 3 and len(set(words)) == 1:
+        return True
+    return False
+
+
 def transcribe_with_whisper(audio_bytes: bytes, language: str = "hi-IN") -> str:
     """Transcribe audio chunk using local Whisper neural model."""
     try:
@@ -113,10 +152,14 @@ def transcribe_with_whisper(audio_bytes: bytes, language: str = "hi-IN") -> str:
             best_of=3,
             temperature=0.0,
             condition_on_previous_text=False,
-            vad_filter=False, # Raw audio already VAD-framed in client
+            vad_filter=True,  # Filter silence and background noise
+            vad_parameters=dict(min_silence_duration_ms=400, speech_pad_ms=150),
         )
         texts = [seg.text.strip() for seg in segments if seg.text and seg.text.strip()]
-        return " ".join(texts).strip()
+        result = " ".join(texts).strip()
+        if is_hallucination_or_noise(result):
+            return ""
+        return result
     except Exception:
         return ""
 
@@ -138,6 +181,11 @@ def transcribe_audio_chunk(
     if not audio_bytes or len(audio_bytes) < 100:
         return ""
 
+    # Check RMS energy — ignore quiet background ambient noise / silence
+    rms = get_audio_rms(audio_bytes)
+    if rms < 180.0:  # Silence / low noise threshold
+        return ""
+
     try:
         # Step 1: Apply DSP bandpass noise filter
         processed_bytes = apply_audio_noise_filter(audio_bytes) if enable_denoise else audio_bytes
@@ -148,9 +196,13 @@ def transcribe_audio_chunk(
             return whisper_result.strip()
 
         # Step 3: Fallback to Google SpeechRecognition
-        r = sr.Recognizer()
+        r: Any = sr.Recognizer()
         r.dynamic_energy_threshold = True
         r.energy_threshold = 250
+
+        recognize_fn = getattr(r, "recognize_google", None)
+        if recognize_fn is None:
+            return ""
 
         audio_file = io.BytesIO(processed_bytes)
         with sr.AudioFile(audio_file) as source:
@@ -161,7 +213,7 @@ def transcribe_audio_chunk(
             audio_data = r.record(source)
             
             try:
-                text = r.recognize_google(audio_data, language=language)
+                text = recognize_fn(audio_data, language=language)
                 if text and text.strip():
                     return text.strip()
             except Exception:
@@ -169,7 +221,7 @@ def transcribe_audio_chunk(
 
             fallback_lang = "en-IN" if language.startswith("hi") else "hi-IN"
             try:
-                text = r.recognize_google(audio_data, language=fallback_lang)
+                text = recognize_fn(audio_data, language=fallback_lang)
                 return text.strip() if text else ""
             except Exception:
                 return ""

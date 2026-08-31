@@ -58,23 +58,44 @@ def open_browser():
     # Fallback to default browser
     webbrowser.open("http://localhost:8000")
 
+import socket
+
+def get_local_ip():
+    """Find the local Wi-Fi / LAN IP address for phone connection."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "localhost"
+
 if __name__ == "__main__":
     if sys.platform == "win32":
         if hasattr(sys.stdout, "reconfigure"):
             sys.stdout.reconfigure(encoding="utf-8")
 
     free_port(8000)
+    local_ip = get_local_ip()
 
-    print("=" * 60)
-    print("  🚀 Starting ASVD 2.0 - AI Scam Voice Detection System")
-    print("=" * 60)
+    print("=" * 65)
+    print("  🚀 ASVD 2.0 — Real-Time AI Scam Voice Detection System")
+    print("=" * 65)
     print()
-    print("  🌐 Main Portal:    http://localhost:8000")
-    print("  📞 Caller Device:  http://localhost:8000/caller")
-    print("  🛡️ Receiver HUD:   http://localhost:8000/receiver")
-    print("  📖 API Docs:       http://localhost:8000/docs")
+    print(f"  📱 PHONE CALLER (Open on Phone): http://{local_ip}:8000/caller")
+    print(f"  🛡️ LAPTOP RECEIVER HUD:         http://localhost:8000/receiver")
+    print(f"  🌐 MAIN PORTAL:                 http://localhost:8000")
+    print(f"  📖 API DOCS:                    http://localhost:8000/docs")
     print()
-    print("=" * 60)
+    print("=" * 65)
+    print("  💡 LIVE DEMO PROTOCOL:")
+    print("  1. Keep the Receiver HUD open on your Laptop.")
+    print("  2. Open the Phone Caller link on your Mobile connected to same Wi-Fi.")
+    print("  3. Tap 'Start Speaking (Mic)' or tap any Preset on your Phone.")
+    print("  4. Watch your Laptop HUD light up with instant Threat Defense alerts!")
+    print("=" * 65)
+    print()
 
     threading.Thread(target=open_browser, daemon=True).start()
     uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=False)

@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: asvd-scam-detection-server
+    env: python
+    buildCommand: pip install -r requirements.txt && python data/generate_dataset.py && python ml/train.py
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+    autoDeploy: true

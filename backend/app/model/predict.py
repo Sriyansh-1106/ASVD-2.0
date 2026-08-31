@@ -41,9 +41,15 @@ _vectorizer: Any = None
 
 
 def _load_model():
-    """Load model and vectorizer from disk (once)."""
+    """Load model and vectorizer from disk (once). Auto-trains if missing."""
     global _model, _vectorizer
     if _model is None:
+        if not os.path.exists(MODEL_PATH) or not os.path.exists(VECTORIZER_PATH):
+            try:
+                from ml.train import train_model
+                train_model()
+            except Exception as e:
+                print(f"Auto-training fallback triggered: {e}")
         _model = joblib.load(MODEL_PATH)
         _vectorizer = joblib.load(VECTORIZER_PATH)
 
