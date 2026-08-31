@@ -19,3 +19,11 @@ test_live_system.py
 # OS files
 .DS_Store
 Thumbs.db
+
+# Mobile dependencies and build artifacts
+mobile/node_modules/
+mobile/android/.gradle/
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/.idea/
+
